@@ -19,8 +19,8 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
     [SerializeField] private InterfaceClient interfaceClient;
 
     [Header("Axis Settings")]
-    [SerializeField] private bool useXAxis = true;
-    [SerializeField] private bool useYAxis = false;
+    [SerializeField] private bool useXAxis = false;
+    [SerializeField] private bool useYAxis = true;
     [SerializeField] private bool useZAxis = false;
 
     [Header("Result")]
