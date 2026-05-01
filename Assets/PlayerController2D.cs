@@ -38,8 +38,8 @@ public class PlayerController2D : MonoBehaviour
     [Header("連携設定")]
     [Tooltip("インスペクターから、対象となる猫(CatGoal)オブジェクトを割り当ててください")]
     public CatGoalController catGoal; // 猫のスクリプトへの参照
-    [Tooltip("外部ネットワークからleft/rightを受け取るクライアント")]
-    public PicoTurnClient turnReceiver;
+    [Tooltip("スマホからleft/rightを受け取るクライアント")]
+    public InterfaceClient turnReceiver;
 
     [Header("ゲーム成功演出")]
     [Tooltip("GoalCatの周囲1マスに入った時に再生する音")]
@@ -73,6 +73,9 @@ public class PlayerController2D : MonoBehaviour
     // 現在の経過ターン数を記録する変数
     private int currentTurnCount = 0; 
 
+    //歩数を記録しておく変数
+    private int stepCount = 0;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -93,18 +96,18 @@ public class PlayerController2D : MonoBehaviour
         if (isActing || hasGameEnded) return;
 
         // Spaceで任意にソナーを発動（反響音は打撃音を優先）
-        if (Input.GetKeyDown(KeyCode.Space) && echolocation != null)
+        if (echolocation != null)
         {
             AudioClip manualSonarClip = bumpSound != null ? bumpSound : echolocation.echoSound;
             echolocation.TriggerSonarWithClip(manualSonarClip, manualSonarVolume);
             return;
         }
 
-        // 1) ネットワークからの左右回転入力
+        // 1) スマホからの左右回転と歩数の入力を受け取る
         if (turnReceiver != null)
         {
-            string turnState = turnReceiver.GetTurnState();
-            if (turnState == "left" || turnState == "right")
+            int turnState = turnReceiver.GetTurnState();
+            if (turnState == 1 || turnState == 0)
             {
                 Vector3 turnDirection = GetTurnDirectionFromState(turnState);
                 StartCoroutine(TurnGrid(turnDirection));
@@ -116,37 +119,20 @@ public class PlayerController2D : MonoBehaviour
             }
         }
 
-        // 2) 矢印キー（Horizontal/Vertical）による従来操作
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
-        if (moveVertical != 0) moveHorizontal = 0;
 
-        if (moveHorizontal != 0 || moveVertical != 0)
-        {
-            Vector3 inputDirection = new Vector3(moveHorizontal, 0f, moveVertical).normalized;
-            float angleDifference = Vector3.Angle(transform.forward, inputDirection);
 
-            if (angleDifference < 1.0f)
-            {
-                StartCoroutine(MoveGrid(inputDirection));
-            }
-            else
-            {
-                StartCoroutine(TurnGrid(inputDirection));
-            }
-            return;
-        }
 
-        // 3) Enter（テンキー含む）で現在向いている方向へ1マス前進
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        // 3) スマホの歩数検知もしくはEnter（テンキー含む）で現在向いている方向へ1マス前進
+        if (turnReceiver.GetStepCount() - stepCount > 0)
         {
             StartCoroutine(MoveGrid(transform.forward));
+            stepCount = turnReceiver.GetStepCount();
         }
     }
 
-    Vector3 GetTurnDirectionFromState(string turnState)
+    Vector3 GetTurnDirectionFromState(int turnState)
     {
-        float yAngle = turnState == "left" ? -90f : 90f;
+        float yAngle = turnState == 1 ? -90f : 90f;
         return Quaternion.Euler(0f, yAngle, 0f) * transform.forward;
     }
 

@@ -686,7 +686,7 @@ MonoBehaviour:
   consumeTurnOnBump: 1
   bumpSoundCooldown: 0.2
   catGoal: {fileID: 1283935693}
-  turnReceiver: {fileID: 774518483}
+  turnReceiver: {fileID: 1663021402}
   goalSuccessSound: {fileID: 8300000, guid: eff2986d671914145ae59859d62d6037, type: 3}
   clearNarration: {fileID: 8300000, guid: b63103119d9ebf94499aec77afea7592, type: 3}
   startSceneName: StartScene
@@ -2143,6 +2143,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1663021401
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1663021403}
+  - component: {fileID: 1663021402}
+  m_Layer: 0
+  m_Name: InterfaceClient
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1663021402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663021401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a58162000f0c4a5e8e1536d560b8ed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MAXLEN: 50
+  turnThreshold: 60
+  resetThreshold: 0.5
+  alpha: 0.1
+  walkingThredhold: 0.04
+  debugMode: 1
+--- !u!4 &1663021403
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663021401}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.3042784, y: -2.0819798, z: -0.45819473}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1676534769
 GameObject:
   m_ObjectHideFlags: 0
@@ -2818,3 +2868,4 @@ SceneRoots:
   - {fileID: 1038100721}
   - {fileID: 774518484}
   - {fileID: 1351178930}
+  - {fileID: 1663021403}
