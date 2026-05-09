@@ -4,6 +4,12 @@ using UnityEngine.InputSystem;
 
 public class WalkingCalibrationInputSystem : MonoBehaviour
 {
+    // シーン遷移を跨いでキャリブレーション結果を保持する
+    public static bool HasPersistedCalibration { get; private set; } = false;
+    public static float PersistedThreshold { get; private set; } = 0.0f;
+    public static float PersistedMean { get; private set; } = 0.0f;
+    public static float PersistedStd { get; private set; } = 0.0f;
+
     [Header("Calibration Settings")]
     [SerializeField] private float calibrationDuration = 10.0f;
     [SerializeField] private float clipDuration = 1.0f;
@@ -50,6 +56,22 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
         }
 
         InputSystem.EnableDevice(linearAccelerationSensor);
+
+        // 既にキャリブレーション結果がある場合は復元
+        if (HasPersistedCalibration)
+        {
+            IsCalibrated = true;
+            Threshold = PersistedThreshold;
+            Mean = PersistedMean;
+            Std = PersistedStd;
+
+            if (interfaceClient != null)
+            {
+                interfaceClient.SetWalkingThreshold(Threshold);
+            }
+
+            Debug.Log($"[WalkingCalibrationInputSystem] Restored calibration. Threshold={Threshold:F6}");
+        }
 
         Debug.Log("Sensor ready. Press start button to begin calibration.");
     }
@@ -110,6 +132,12 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
 
             isCalibrating = false;
             IsCalibrated = true;
+
+            // 次シーン向けに結果を保持
+            HasPersistedCalibration = true;
+            PersistedThreshold = Threshold;
+            PersistedMean = Mean;
+            PersistedStd = Std;
 
             Debug.Log("Calibration finished.");
             Debug.Log($"Mean      : {Mean:F6}");
@@ -204,5 +232,13 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
     public bool IsCalibrating()
     {
         return isCalibrating;
+    }
+
+    public static void ClearPersistedCalibration()
+    {
+        HasPersistedCalibration = false;
+        PersistedThreshold = 0.0f;
+        PersistedMean = 0.0f;
+        PersistedStd = 0.0f;
     }
 }

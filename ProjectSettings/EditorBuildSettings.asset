@@ -8,6 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/TestScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/StandByScenes/1. WaitingScene.unity
+    guid: 209e2b499c6cd22439f6e7cfeb229d87
+  - enabled: 1
+    path: Assets/Scenes/StandByScenes/2. AdjustingScene.unity
+    guid: 6c329a16025cc46468765d378b497000
+  - enabled: 1
+    path: Assets/Scenes/StandByScenes/3. CalibrationScene.unity
+    guid: ed7d959046457304f90f0468e7fec07d
+  - enabled: 1
+    path: Assets/Scenes/TutorialScenes/TutorialScene1.unity
+    guid: c54ec7eea1dd2464fbb1c692a9e88dcc
   - enabled: 0
     path: Assets/Scenes/MazeScenes/StartScene.unity
     guid: c5d4ed3409c48d841a38e89f6c69852f

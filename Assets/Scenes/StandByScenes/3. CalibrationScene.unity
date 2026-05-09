@@ -243,8 +243,8 @@ MonoBehaviour:
   calibrationDelayTime: 3
   walkingCalibration: {fileID: 85093256}
   debugMode: 1
-  completionSound: {fileID: 0}
-  narrationSound: {fileID: 0}
+  completionSound: {fileID: 8300000, guid: 88b14686e4f58ee4e9e1501194258c80, type: 3}
+  narrationSound: {fileID: 8300000, guid: eff2986d671914145ae59859d62d6037, type: 3}
   audioSource: {fileID: 1546379544}
 --- !u!4 &1116833988
 Transform:

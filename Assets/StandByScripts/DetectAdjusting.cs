@@ -15,18 +15,20 @@ public class DetectAdjusting : MonoBehaviour
     [Tooltip("デバッグモード")]
     public bool debugMode = true;
 
+    [Tooltip("デバッグログの出力間隔（秒）。0なら毎フレーム出力")]
+    public float debugLogInterval = 0.5f;
+
     [Header("Events")]
     [Tooltip("5秒間の静止が検知されたときに発火するイベント")]
     public UnityEvent onStillnessDetected;
 
     [Header("Sound Settings")]
-    [Tooltip("初期起動時の効果音")]
     public AudioClip startupSound;
     [Tooltip("検知完了時の効果音")]
     public AudioClip stillnessSound;
     [Tooltip("検知完了後のBGM")]
     public AudioClip completedBGM;
-    [Tooltip("注意事項の音声")]
+    [Tooltip("注意事項の音声（SF3）")]
     public AudioClip cautionAudio;
 
     [Tooltip("BGM再生用のAudioSource")]
@@ -39,8 +41,11 @@ public class DetectAdjusting : MonoBehaviour
 
     private float stillnessStartTime = -1f;
     private bool isCurrentlyStill = false;
+    private float lastDebugLogTime = -999f;
 
     private bool cautionAudioIsPlayed = false;
+    // 一度だけSF3再生→遷移するためのガード
+    private bool hasTriggeredSF3 = false;
 
     void Start()
     {
@@ -76,8 +81,19 @@ public class DetectAdjusting : MonoBehaviour
         if (cautionAudioIsPlayed) DetectCautionAudioEnd();
         if (LinearAccelerationSensor.current == null) return;
 
+        // if (cautionAudioSource.isPlaying && !cautionAudioIsPlayed) return;
+
         Vector3 lin = LinearAccelerationSensor.current.acceleration.ReadValue();
         float mag = lin.magnitude;
+
+        if (debugMode)
+        {
+            if (debugLogInterval <= 0f || Time.time - lastDebugLogTime >= debugLogInterval)
+            {
+                Debug.Log($"[DetectAdjusting] mag={mag:F3}, still={(isCurrentlyStill ? "true" : "false")}, elapsed={(isCurrentlyStill ? (Time.time - stillnessStartTime).ToString("F2") : "0.00")}");
+                lastDebugLogTime = Time.time;
+            }
+        }
 
         // 加速度が閾値以下 = 静止状態
         if (mag < stillnessThreshold)
@@ -92,15 +108,21 @@ public class DetectAdjusting : MonoBehaviour
 
             // 静止状態の継続時間をチェック
             float elapsedTime = Time.time - stillnessStartTime;
-            if (elapsedTime >= stillnessDuration)
-            {
-                if (debugMode) Debug.Log($"[DetectAdjusting] Stillness detected for {stillnessDuration} seconds!");
-                onStillnessDetected?.Invoke();
+                if (elapsedTime >= stillnessDuration)
+                {
+                    if (debugMode) Debug.Log($"[DetectAdjusting] Stillness detected for {stillnessDuration} seconds!");
+                    // 既に一度処理済みなら何もしない
+                    if (!hasTriggeredSF3)
+                    {
+                        onStillnessDetected?.Invoke();
+                        // 呼び出し側で changeSoundFile を呼ぶ想定。二重実行防止のためフラグを立てる
+                        hasTriggeredSF3 = true;
+                    }
 
-                // 再検知を防ぐため、状態をリセット
-                isCurrentlyStill = false;
-                stillnessStartTime = -1f;
-            }
+                    // 再検知を防ぐため、状態をリセット
+                    isCurrentlyStill = false;
+                    stillnessStartTime = -1f;
+                }
         }
         else
         {
@@ -122,6 +144,7 @@ public class DetectAdjusting : MonoBehaviour
     {
         isCurrentlyStill = false;
         stillnessStartTime = -1f;
+        lastDebugLogTime = -999f;
         if (debugMode) Debug.Log("[DetectAdjusting] Stillness detection reset.");
     }
 

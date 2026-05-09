@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class InactivityTimer : MonoBehaviour
 {
@@ -13,7 +14,25 @@ public class InactivityTimer : MonoBehaviour
     {
         // 何らかのキーボード入力、または移動操作があったかチェック
         // Input.anyKey はキーが押されている間ずっと反応します
-        if (Input.anyKey || Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        bool hasInput = false;
+        
+        // キーボード入力をチェック
+        if (Keyboard.current != null && Keyboard.current.anyKey.isPressed)
+        {
+            hasInput = true;
+        }
+        
+        // ゲームパッド入力をチェック
+        if (!hasInput && Gamepad.current != null)
+        {
+            var movement = Gamepad.current.leftStick.ReadValue();
+            if (movement.magnitude > 0.1f)
+            {
+                hasInput = true;
+            }
+        }
+        
+        if (hasInput)
         {
             // 入力があればタイマーをリセット
             timer = 0f; 

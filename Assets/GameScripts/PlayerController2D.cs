@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController2D : MonoBehaviour
@@ -10,6 +11,9 @@ public class PlayerController2D : MonoBehaviour
     [Header("足音設定")]
     public AudioClip groundSound; // 土の足音
     public AudioClip metalSound; // 鉄板の足音
+    public AudioClip turnSound; // 向き変更時の音
+    public AudioClip turnRightSound; // 右回転時の音
+    public AudioClip turnLeftSound; // 左回転時の音
     [Header("壁衝突設定")]
     public AudioClip bumpSound; // ぶつかった瞬間の音（カンッという音など）
     [Header("持続ノイズ設定(コンテナ用)")]
@@ -33,6 +37,8 @@ public class PlayerController2D : MonoBehaviour
     [Header("操作設定")]
     [Tooltip("スマホのキャリブレーション入力を優先して使う")]
     [SerializeField] private bool useImuInput = true;
+    [Tooltip("IMU入力のデバッグログを出す")]
+    [SerializeField] private bool debugImuInput = true;
     [Tooltip("InterfaceClient への参照（IMU入力）")]
     [SerializeField] private InterfaceClient imuInterface;
     [Tooltip("キャリブレーション入力システム")]
@@ -84,6 +90,11 @@ public class PlayerController2D : MonoBehaviour
     {
     lastStepCount = imuInterface.GetStepCount();
     }
+
+    if (debugImuInput)
+    {
+    Debug.Log($"[PlayerController2D] Start: useImuInput={useImuInput}, mobile={Application.isMobilePlatform}, imuInterface={(imuInterface != null)}, walkingCalibration={(walkingCalibration != null)}, persistedCalibration={WalkingCalibrationInputSystem.HasPersistedCalibration}");
+    }
     }
     void Update()
     {
@@ -104,33 +115,72 @@ public class PlayerController2D : MonoBehaviour
     bool TryHandleImuInput()
     {
     if (!useImuInput) return false;
-    if (!Application.isMobilePlatform) return false;
-    if (imuInterface == null || walkingCalibration == null) return false;
-    if (!walkingCalibration.IsCalibrated) return false;
+    if (!Application.isMobilePlatform)
+    {
+    if (debugImuInput) Debug.Log("[PlayerController2D] IMU skipped: not running on mobile platform.");
+    return false;
+    }
+    if (imuInterface == null)
+    {
+    if (debugImuInput) Debug.LogWarning("[PlayerController2D] IMU skipped: imuInterface is null.");
+    return false;
+    }
+    bool calibrated = (walkingCalibration != null && walkingCalibration.IsCalibrated)
+        || WalkingCalibrationInputSystem.HasPersistedCalibration;
+    if (!calibrated)
+    {
+    if (debugImuInput) Debug.Log($"[PlayerController2D] IMU skipped: calibration not ready. walkingCalibration={(walkingCalibration != null)}, IsCalibrated={(walkingCalibration != null && walkingCalibration.IsCalibrated)}, persisted={WalkingCalibrationInputSystem.HasPersistedCalibration}");
+    return false;
+    }
     int turnState = imuInterface.GetTurnState();
     if (turnState == 0)
     {
+    if (debugImuInput) Debug.Log("[PlayerController2D] IMU turn detected: RIGHT");
     StartCoroutine(TurnGrid(transform.right));
     return true;
     }
     if (turnState == 1)
     {
+    if (debugImuInput) Debug.Log("[PlayerController2D] IMU turn detected: LEFT");
     StartCoroutine(TurnGrid(-transform.right));
     return true;
     }
     int currentStepCount = imuInterface.GetStepCount();
     if (currentStepCount > lastStepCount)
     {
+    if (debugImuInput) Debug.Log($"[PlayerController2D] IMU step detected: last={lastStepCount}, current={currentStepCount}");
     lastStepCount = currentStepCount;
     StartCoroutine(MoveGrid(transform.forward));
     return true;
     }
+    if (debugImuInput) Debug.Log($"[PlayerController2D] IMU ready but no action: turnState={turnState}, stepCount={currentStepCount}");
     return false;
     }
     void HandleKeyboardInput()
     {
-    float moveHorizontal = Input.GetAxisRaw("Horizontal");
-    float moveVertical = Input.GetAxisRaw("Vertical");
+    if (Keyboard.current == null) return;
+
+    float moveHorizontal = 0f;
+    float moveVertical = 0f;
+
+    if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
+    {
+    moveHorizontal = -1f;
+    }
+    else if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
+    {
+    moveHorizontal = 1f;
+    }
+
+    if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
+    {
+    moveVertical = -1f;
+    }
+    else if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
+    {
+    moveVertical = 1f;
+    }
+
     if (moveVertical != 0) moveHorizontal = 0;
     if (moveHorizontal != 0 || moveVertical != 0)
     {
@@ -186,25 +236,41 @@ public class PlayerController2D : MonoBehaviour
     }
     CheckGroundMaterial();
     PlayStepSound();
-    if (echolocation != null)
-    {
-    echolocation.TriggerSonar();
-    }
     Vector3 startPosition = transform.position;
     float elapsedTime = 0f;
     while (elapsedTime < moveTime)
     {
-    transform.position = Vector3.Lerp(startPosition, targetPosition, (elapsedTime / moveTime));
-    elapsedTime += Time.deltaTime;
-    yield return null;
+        transform.position = Vector3.Lerp(startPosition, targetPosition, (elapsedTime / moveTime));
+        elapsedTime += Time.deltaTime;
+        yield return null;
     }
     transform.position = targetPosition;
+    if (echolocation != null)
+    {
+        echolocation.TriggerSonar();
+    }
     EndTurn();
     isActing = false;
     }
     IEnumerator TurnGrid(Vector3 direction)
     {
     isActing = true;
+    if (audioSource != null)
+    {
+    float turnDot = Vector3.Dot(direction.normalized, transform.right);
+    if (turnDot > 0.1f && turnRightSound != null)
+    {
+    audioSource.PlayOneShot(turnRightSound);
+    }
+    else if (turnDot < -0.1f && turnLeftSound != null)
+    {
+    audioSource.PlayOneShot(turnLeftSound);
+    }
+    else if (turnSound != null)
+    {
+    audioSource.PlayOneShot(turnSound);
+    }
+    }
     Quaternion startRotation = transform.rotation;
     Quaternion targetRotation = Quaternion.LookRotation(direction);
     float elapsedTime = 0f;
@@ -252,6 +318,11 @@ public class PlayerController2D : MonoBehaviour
     else if (currentGroundTag == "Metal" && metalSound != null)
     {
     audioSource.PlayOneShot(metalSound);
+    }
+    else if (groundSound != null)
+    {
+    // 壁に寄って床タグが取れない場合でも足音を鳴らす
+    audioSource.PlayOneShot(groundSound);
     }
     }
     void CheckGroundMaterial()

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(AudioSource))]
@@ -12,6 +13,9 @@ public class PlayerController : MonoBehaviour
     [Header("足音設定")]
     public AudioClip groundSound; // 土の足音
     public AudioClip metalSound;  // 鉄板の足音
+    public AudioClip turnSound;   // 向き変更時の音
+    public AudioClip turnRightSound; // 右回転時の音
+    public AudioClip turnLeftSound;  // 左回転時の音
 
     [Header("壁衝突設定")]
     public AudioClip bumpSound; // ぶつかった瞬間の音（カンッという音など）
@@ -57,8 +61,28 @@ public class PlayerController : MonoBehaviour
     {
         if (isActing) return;
 
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
+        if (Keyboard.current == null) return;
+
+        float moveHorizontal = 0f;
+        float moveVertical = 0f;
+
+        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
+        {
+            moveHorizontal = -1f;
+        }
+        else if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
+        {
+            moveHorizontal = 1f;
+        }
+
+        if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
+        {
+            moveVertical = -1f;
+        }
+        else if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
+        {
+            moveVertical = 1f;
+        }
 
         if (moveVertical != 0) moveHorizontal = 0;
 
@@ -119,6 +143,7 @@ public class PlayerController : MonoBehaviour
             yield return null; 
         }
         transform.position = targetPosition;
+        TriggerEcholocationAfterMove();
 
         // 移動完了してターン消費
         EndTurn(); 
@@ -129,6 +154,23 @@ public class PlayerController : MonoBehaviour
     IEnumerator TurnGrid(Vector3 direction)
     {
         isActing = true;
+
+        if (audioSource != null)
+        {
+            float turnDot = Vector3.Dot(direction.normalized, transform.right);
+            if (turnDot > 0.1f && turnRightSound != null)
+            {
+                audioSource.PlayOneShot(turnRightSound);
+            }
+            else if (turnDot < -0.1f && turnLeftSound != null)
+            {
+                audioSource.PlayOneShot(turnLeftSound);
+            }
+            else if (turnSound != null)
+            {
+                audioSource.PlayOneShot(turnSound);
+            }
+        }
 
         Quaternion startRotation = transform.rotation;
         Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -198,20 +240,24 @@ public class PlayerController : MonoBehaviour
     {
         if (audioSource == null) return;
         
-        bool isSoundPlayed = false;
-
         if (currentGroundTag == "Ground" && groundSound != null)
         {
             audioSource.PlayOneShot(groundSound);
-            isSoundPlayed = true;
         }
         else if (currentGroundTag == "Metal" && metalSound != null)
         {
             audioSource.PlayOneShot(metalSound);
-            isSoundPlayed = true;
         }
+        else if (groundSound != null)
+        {
+            // 壁際などで床タグ取得に失敗した場合でも無音にしない
+            audioSource.PlayOneShot(groundSound);
+        }
+    }
 
-        if (isSoundPlayed && echolocation != null)
+    void TriggerEcholocationAfterMove()
+    {
+        if (echolocation != null)
         {
             echolocation.TriggerSonar();
         }

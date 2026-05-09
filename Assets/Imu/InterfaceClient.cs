@@ -54,6 +54,16 @@ public class InterfaceClient : MonoBehaviour
         yaw = 0.0f;
         lastMs = Time.realtimeSinceStartup;
 
+        // シーン遷移後でもキャリブレーション済み閾値を引き継ぐ
+        if (WalkingCalibrationInputSystem.HasPersistedCalibration)
+        {
+            SetWalkingThreshold(WalkingCalibrationInputSystem.PersistedThreshold);
+            if (debugMode)
+            {
+                Debug.Log($"[InterfaceClient] Restored walking threshold: {WalkingCalibrationInputSystem.PersistedThreshold:F6}");
+            }
+        }
+
         //enable sensors
         if (LinearAccelerationSensor.current != null)
             InputSystem.EnableDevice(LinearAccelerationSensor.current);

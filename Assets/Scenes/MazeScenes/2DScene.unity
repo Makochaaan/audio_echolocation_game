@@ -384,7 +384,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774518482}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1c4f6da24debf34b808c5fc8fa66819, type: 3}
   m_Name: 
@@ -768,6 +768,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   echoSound: {fileID: 8300000, guid: 717a9678f46f62642ad40f2038e39381, type: 3}
+  footstepRSound: {fileID: 0}
+  footstepLSound: {fileID: 0}
   maxDistance: 5
   soundSpeed: 10
   volumeRolloffCurve:
@@ -811,6 +813,9 @@ MonoBehaviour:
   gridSize: 1
   groundSound: {fileID: 8300000, guid: e3d271232f0966249b4ccfc5f7d67698, type: 3}
   metalSound: {fileID: 8300000, guid: e3d271232f0966249b4ccfc5f7d67698, type: 3}
+  turnSound: {fileID: 0}
+  turnRightSound: {fileID: 8300000, guid: e1aa036a81fa48440b3fda5a2561c020, type: 3}
+  turnLeftSound: {fileID: 8300000, guid: 4cfd096a1cd44c6488b4c16f58ad0110, type: 3}
   bumpSound: {fileID: 8300000, guid: 2abb9446db9e02849906f3ff978550cc, type: 3}
   sustainNoiseSound: {fileID: 8300000, guid: fb5e69d757076ea4a82534aed08ffba7, type: 3}
   sustainDurationTurns: 3
@@ -835,7 +840,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: e3d271232f0966249b4ccfc5f7d67698, type: 3}
   m_Resource: {fileID: 8300000, guid: e3d271232f0966249b4ccfc5f7d67698, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -854,8 +859,8 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
+      time: 0.004667282
+      value: 0.8347435
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -909,7 +914,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.073
+      value: 1.1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1102,7 +1107,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1121,8 +1126,8 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.11555685
-      value: 0.9976196
+      time: 0.117891446
+      value: 0.8013725
       inSlope: -0.060203247
       outSlope: -0.060203247
       tangentMode: 0
@@ -1131,16 +1136,16 @@ AudioSource:
       outWeight: 1
     - serializedVersion: 3
       time: 0.23555094
-      value: 0.75554657
-      inSlope: -3.7815692
-      outSlope: -3.7815692
+      value: 0.66259
+      inSlope: -2.4727616
+      outSlope: -2.4727616
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.84615535
+      outWeight: 1
     - serializedVersion: 3
-      time: 0.31704357
-      value: 0.4507904
+      time: 0.31470898
+      value: 0.43013
       inSlope: -3.110174
       outSlope: -3.110174
       tangentMode: 0
@@ -1343,9 +1348,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveTime: 0.3
   gridSize: 1
-  meowSound: {fileID: 0}
+  meowSound: {fileID: 8300000, guid: a519813050096cd4b95b555ab017dc4a, type: 3}
   randomMeowCandidates:
   - {fileID: 8300000, guid: a519813050096cd4b95b555ab017dc4a, type: 3}
+  spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
+  idleTurnsBeforeActive: 10
+  moveIntervalTurns: 2
+  playerTransform: {fileID: 1265943442}
+  meowWhileIdle: 1
+  meowIntervalDuringIdle: 1
 --- !u!114 &1283935694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1501,7 +1512,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1351178928}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61e4c5ab309bbde47859b09dcad79c65, type: 3}
   m_Name: 

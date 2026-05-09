@@ -7,6 +7,8 @@ public class Echolocation : MonoBehaviour
 {
     [Header("音の設定")]
     public AudioClip echoSound;  // 反響音
+    public AudioClip footstepRSound;  // 右方向の反射音
+    public AudioClip footstepLSound;  // 左方向の反射音
 
     [Header("ソナーの設定")]
     public float maxDistance = 20f; // 音が届く（索敵できる）最大距離
@@ -81,7 +83,18 @@ public class Echolocation : MonoBehaviour
             if (Physics.Raycast(transform.position, direction, out RaycastHit hit, maxDistance))
             {
                 float delay = hit.distance / soundSpeed;
-                StartCoroutine(PlayEchoWith3DSound(hit.point, delay));
+                if (Mathf.Approximately(angle, 90f))
+                {
+                    StartCoroutine(PlayEchoWith3DSound(hit.point, delay, footstepRSound ?? echoSound));
+                }
+                else if (Mathf.Approximately(angle, 270f))
+                {
+                    StartCoroutine(PlayEchoWith3DSound(hit.point, delay, footstepLSound ?? echoSound));
+                }
+                else
+                {
+                    StartCoroutine(PlayEchoWith3DSoundPair(hit.point, delay));
+                }
                 Debug.DrawLine(transform.position, hit.point, Color.red, 1.0f);
             }
             else
@@ -91,19 +104,44 @@ public class Echolocation : MonoBehaviour
         }
     }
 
-    IEnumerator PlayEchoWith3DSound(Vector3 position, float delay)
+    IEnumerator PlayEchoWith3DSoundPair(Vector3 position, float delay)
     {
         yield return new WaitForSeconds(delay);
 
-        if (echoSound != null)
+        if (footstepRSound != null)
         {
-            AudioSource source = GetAvailableSource();
-            // 万が一プールされた音源のSpatializeが外れていた場合は強制的に再適用
-            source.spatialize = true; 
-            
-            source.transform.position = position;
-            source.clip = echoSound;
-            source.Play();
+            PlayOneShotAtPosition(position, footstepRSound);
         }
+
+        if (footstepLSound != null)
+        {
+            PlayOneShotAtPosition(position, footstepLSound);
+        }
+
+        if (footstepRSound == null && footstepLSound == null && echoSound != null)
+        {
+            PlayOneShotAtPosition(position, echoSound);
+        }
+    }
+
+    IEnumerator PlayEchoWith3DSound(Vector3 position, float delay, AudioClip clip)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (clip != null)
+        {
+            PlayOneShotAtPosition(position, clip);
+        }
+    }
+
+    void PlayOneShotAtPosition(Vector3 position, AudioClip clip)
+    {
+        AudioSource source = GetAvailableSource();
+        // 万が一プールされた音源のSpatializeが外れていた場合は強制的に再適用
+        source.spatialize = true;
+
+        source.transform.position = position;
+        source.clip = clip;
+        source.Play();
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class turntest : MonoBehaviour
 {
@@ -7,7 +8,7 @@ public class turntest : MonoBehaviour
     private void Update()
     {
         // Enterキーを押したときに1件だけ取り出して確認
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame)
         {
             string turn = turnReceiver.GetTurnState();
             Debug.Log("GetTurnState() -> " + turn);

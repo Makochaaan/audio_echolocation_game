@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(AudioSource))]
 public class StartScreenController : MonoBehaviour
@@ -30,7 +31,12 @@ public class StartScreenController : MonoBehaviour
 
     void Update()
     {
-        if (!(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (!(Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame))
         {
             return;
         }
