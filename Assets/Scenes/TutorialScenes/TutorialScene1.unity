@@ -364,8 +364,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c4f6da24debf34b808c5fc8fa66819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIp: 192.168.11.4
-  pollInterval: 0.1
 --- !u!4 &774518484
 Transform:
   m_ObjectHideFlags: 0
@@ -393,12 +391,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c53b5ccfb664dc42bab3ca03a901b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MAXLEN: 50
-  turnThreshold: 60
-  resetThreshold: 0.5
-  alpha: 0.1
-  walkingThredhold: 0.04
-  debugMode: 1
 --- !u!1 &1086414774
 GameObject:
   m_ObjectHideFlags: 0
@@ -538,10 +530,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8cc19b915eedf4fa71ebb3124b742d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  echoSound: {fileID: 8300000, guid: 7681c9cc968ccdf44b3bc75d50499abb, type: 3}
-  footstepRSound: {fileID: 8300000, guid: 882bfcdf459c7184ca46c1930bb00233, type: 3}
-  footstepLSound: {fileID: 8300000, guid: 52a3cb6364702c94c81a0e5499a5db0c, type: 3}
-  maxDistance: 5
+  echoSound: {fileID: 0}
+  footstepRSound: {fileID: 0}
+  footstepLSound: {fileID: 0}
+  maxDistance: 20
   soundSpeed: 10
   volumeRolloffCurve:
     serializedVersion: 2
@@ -567,7 +559,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
+  spatialMixerGroup: {fileID: 0}
 --- !u!114 &1265943436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -582,20 +574,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveTime: 0.2
   gridSize: 1
-  groundSound: {fileID: 8300000, guid: 1c41743f48758bd41b7d99bd4a3c02fb, type: 3}
-  metalSound: {fileID: 8300000, guid: 1c41743f48758bd41b7d99bd4a3c02fb, type: 3}
-  turnSound: {fileID: 8300000, guid: 4af21e7ff32e45e42a71cdb38faed63e, type: 3}
-  turnRightSound: {fileID: 8300000, guid: 4af21e7ff32e45e42a71cdb38faed63e, type: 3}
-  turnLeftSound: {fileID: 8300000, guid: 710375a44d376294d8130a26cb550240, type: 3}
-  bumpSound: {fileID: 8300000, guid: 2abb9446db9e02849906f3ff978550cc, type: 3}
-  sustainNoiseSound: {fileID: 8300000, guid: fb5e69d757076ea4a82534aed08ffba7, type: 3}
+  groundSound: {fileID: 8300000, guid: 582afd3e9676a47148be83d26746d351, type: 3}
+  metalSound: {fileID: 0}
+  turnSound: {fileID: 0}
+  turnRightSound: {fileID: 0}
+  turnLeftSound: {fileID: 0}
+  bumpSound: {fileID: 0}
+  sustainNoiseSound: {fileID: 0}
   sustainDurationTurns: 2
   consumeTurnOnBump: 1
-  spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
+  spatialMixerGroup: {fileID: 0}
   catGoal: {fileID: 0}
   clearSound: {fileID: 0}
   clearUI: {fileID: 0}
   useImuInput: 1
+  debugImuInput: 1
   imuInterface: {fileID: 0}
   walkingCalibration: {fileID: 0}
 --- !u!82 &1265943437
@@ -831,17 +824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef5e1719799ca4f9b9f5db81449517ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bypassRoomEffects: 0
-  directivityAlpha: 0
-  directivitySharpness: 1
-  listenerDirectivityAlpha: 0
-  listenerDirectivitySharpness: 1
-  gainDb: 0
-  nearFieldEffectEnabled: 0
-  nearFieldEffectGain: 1
-  occlusionEnabled: 0
-  occlusionIntensity: 1
-  quality: 2
 --- !u!1 &1283935684
 GameObject:
   m_ObjectHideFlags: 0
@@ -1099,17 +1081,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef5e1719799ca4f9b9f5db81449517ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bypassRoomEffects: 0
-  directivityAlpha: 0
-  directivitySharpness: 1
-  listenerDirectivityAlpha: 0
-  listenerDirectivitySharpness: 1
-  gainDb: 0
-  nearFieldEffectEnabled: 0
-  nearFieldEffectGain: 1
-  occlusionEnabled: 0
-  occlusionIntensity: 1
-  quality: 2
 --- !u!114 &1283935695
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,7 +1093,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e5043100fdf36d4aa0b81d74cb87e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meowSound: {fileID: 8300000, guid: a519813050096cd4b95b555ab017dc4a, type: 3}
 --- !u!1 &1288698560
 GameObject:
   m_ObjectHideFlags: 0
@@ -1260,7 +1230,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e4c5ab309bbde47859b09dcad79c65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnReceiver: {fileID: 774518483}
 --- !u!4 &1351178930
 Transform:
   m_ObjectHideFlags: 0
@@ -1375,8 +1344,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22d8d3efb64a4f4187d83b5ca9c48e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1265943442}
-  offset: {x: 0, y: 6, z: -6}
 --- !u!114 &1537814753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1433,7 +1400,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c11cf7dce96f5c46b6c0dc6511f7b22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeoutSeconds: 60
 --- !u!114 &1537814755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1446,18 +1412,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bdd73e30e017534f90aa94e292ce409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1265943442}
-  tutorialWall: {fileID: 1288698560}
-  catGoal: {fileID: 1283935684}
-  tutorialCatController: {fileID: 1283935695}
-  instructionText: {fileID: 406319088}
-  narratorSource: {fileID: 1265943437}
-  narrationClips:
-  - {fileID: 8300000, guid: 7ee68e56d2abb1e4db67c9d34efde33b, type: 3}
-  - {fileID: 8300000, guid: c46868f143c6ed54bacf42b301696f1b, type: 3}
-  - {fileID: 8300000, guid: d3b7eccc8fafada4c96701dbf23b77e6, type: 3}
-  - {fileID: 8300000, guid: a2e2be5e45ecf554e8463e007e69f987, type: 3}
-  bumpDetectDistance: 0.55
 --- !u!1 &1664877945
 GameObject:
   m_ObjectHideFlags: 0
