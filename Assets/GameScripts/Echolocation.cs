@@ -22,8 +22,20 @@ public class Echolocation : MonoBehaviour
     [Tooltip("Resonance Audio Rendererエフェクトを追加したMixer Groupを割り当ててください")]
     public UnityEngine.Audio.AudioMixerGroup spatialMixerGroup;
 
+    [Header("リバーブ設定")]
+    public bool applyReverb = true;
+    public AudioReverbPreset reverbPreset = AudioReverbPreset.Cave;
+    [Tooltip("PresetがUserの時のみ有効")]
+    [Range(-10000f, 0f)]
+    public float reverbLevel = -1000f;
+    [Tooltip("PresetがUserの時のみ有効")]
+    [Range(0.1f, 20f)]
+    public float reverbDecayTime = 2.5f;
+
     // オブジェクトプーリング用：作成したスピーカーを保存しておくリスト
     private List<AudioSource> sourcePool = new List<AudioSource>();
+
+    public event System.Action OnEchoFinished;
 
     // 空いている（音が鳴り終わった）スピーカーを探す、なければ作る
     private AudioSource GetAvailableSource()
@@ -67,6 +79,7 @@ public class Echolocation : MonoBehaviour
             newSource.maxDistance = maxDistance;
         }
 
+        ApplyReverb(newSource);
         sourcePool.Add(newSource);
         return newSource;
     }
@@ -139,9 +152,43 @@ public class Echolocation : MonoBehaviour
         AudioSource source = GetAvailableSource();
         // 万が一プールされた音源のSpatializeが外れていた場合は強制的に再適用
         source.spatialize = true;
+        ApplyReverb(source);
 
         source.transform.position = position;
         source.clip = clip;
         source.Play();
+
+        StartCoroutine(NotifyEchoFinished(source));
+    }
+
+    IEnumerator NotifyEchoFinished(AudioSource source)
+    {
+        if (source == null || source.clip == null) yield break;
+
+        float clipLength = source.clip.length;
+        if (clipLength > 0f)
+        {
+            yield return new WaitForSeconds(clipLength);
+        }
+
+        OnEchoFinished?.Invoke();
+    }
+
+    void ApplyReverb(AudioSource source)
+    {
+        if (!applyReverb || source == null) return;
+
+        AudioReverbFilter filter = source.GetComponent<AudioReverbFilter>();
+        if (filter == null)
+        {
+            filter = source.gameObject.AddComponent<AudioReverbFilter>();
+        }
+
+        filter.reverbPreset = reverbPreset;
+        if (reverbPreset == AudioReverbPreset.User)
+        {
+            filter.reverbLevel = reverbLevel;
+            filter.decayTime = reverbDecayTime;
+        }
     }
 }

@@ -32,6 +32,7 @@ public class Tutorial1Controller : MonoBehaviour
     private int turnCount = 0;
     private int moveCount = 0;
     private bool isNarrationPlaying = false;
+    private PlayerController2D playerController2D;
 
     void Start()
     {
@@ -49,6 +50,11 @@ public class Tutorial1Controller : MonoBehaviour
 
         lastPos = player.position;
         lastRot = player.rotation;
+
+        if (player != null)
+        {
+            playerController2D = player.GetComponent<PlayerController2D>();
+        }
 
         StartCoroutine(TutorialRoutine());
     }
@@ -81,6 +87,11 @@ public class Tutorial1Controller : MonoBehaviour
     {
         // ナレーション中は操作を受け付けない
         if (isNarrationPlaying) return false;
+
+        if (playerController2D != null && playerController2D.ConsumeBumpSignal())
+        {
+            return true;
+        }
 
         if (Keyboard.current == null) return false;
 
@@ -128,9 +139,15 @@ public class Tutorial1Controller : MonoBehaviour
         Vector3 frontDir = GetGridDir(player.forward);
         Vector3 startPos = GetGridPos(player.position);
         tutorialWall.transform.position = startPos + frontDir * 3f;
+        tutorialWall.tag = "Wall";
         tutorialWall.SetActive(true);
 
-        yield return StartCoroutine(PlayInstruction("前方に壁を置きました。その壁に向かって、まっすぐ歩いてみてください。", narrationClips[0]));
+        yield return StartCoroutine(PlayInstruction("まっすぐ歩いてみてください。", narrationClips[0]));
+        // 2歩進んだら次のナレーションへ
+        moveCount = 0;
+        while (moveCount < 2) yield return null;
+
+        yield return StartCoroutine(PlayInstruction("前方に壁を置きました。その壁に向かって、歩いてみてください。", narrationClips[1]));
         
         // 壁にぶつかるまで待機
         bool hasBumped = false;
@@ -146,25 +163,24 @@ public class Tutorial1Controller : MonoBehaviour
 
         yield return StartCoroutine(WaitForFacingStable());
 
-        yield return StartCoroutine(PlayInstruction("壁にぶつかりました。（ドン）壁にぶつかると、進めません。壁へ近づくにつれて、足音が少しずつ変わっていったことに気付きましたか？", narrationClips[1]));
+        yield return StartCoroutine(PlayInstruction("壁にぶつかりました。（ドン）壁にぶつかると、進めません。壁へ近づくにつれて、足音が少しずつ変わっていったことに気付きましたか？", narrationClips[2]));
 
         // --- ステップ2 ---
         // テキスト：回転を体験する。回転カウンターを使用して2回の回転を待つ
-        yield return StartCoroutine(PlayInstruction("手すりを持ったまま、身体ごと横に向きを変えてください。", narrationClips[2]));
+        yield return StartCoroutine(PlayInstruction("手すりを持ったまま、身体ごと横に向きを変えてください。", narrationClips[3]));
         
         // 2回の回転を待機
         turnCount = 0;
         while (turnCount < 1) yield return null;
 
-        yield return StartCoroutine(PlayInstruction("向きが変わりました。向きを変えると、進める方向が変わります。ゲームの中では90度づつ曲がることができます。もう一度、同じ向きで、向きを変えてみてください。", narrationClips[2]));
+        yield return StartCoroutine(PlayInstruction("向きが変わりました。向きを変えると、進める方向が変わります。ゲームの中では90度づつ曲がることができます。もう一度、同じ向きで、向きを変えてみてください。", narrationClips[4]));
 
         while (turnCount < 2) yield return null;
 
-        yield return StartCoroutine(PlayInstruction("歩いてください。", narrationClips[0]));
+        yield return StartCoroutine(PlayInstruction("歩いてください。", narrationClips[5]));
         moveCount = 0;
         while (moveCount < 1) yield return null;
 
-        yield return StartCoroutine(PlayInstruction("あなたは今、壁を背にして歩いています。音の変化に気付きましたか？", narrationClips[3]));
         
         yield return StartCoroutine(WaitForFacingStable());
 
@@ -172,6 +188,7 @@ public class Tutorial1Controller : MonoBehaviour
         // 壁を目の前の3マス先に配置し、その裏1マス目に猫を配置
         Vector3 forwardDir = GetGridDir(player.forward);
         tutorialWall.transform.position = GetGridPos(player.position) + forwardDir * 4f;
+        tutorialWall.tag = "Container";
         
         // チュートリアル用の猫を配置
         if(tutorialCatController != null)
@@ -185,7 +202,7 @@ public class Tutorial1Controller : MonoBehaviour
             catGoal.SetActive(true);
         }
         
-        yield return StartCoroutine(PlayInstruction("おや？　どこからか、猫の声が聞こえてきました。猫の方へ向かって、歩いてみましょう。", narrationClips[2]));
+        yield return StartCoroutine(PlayInstruction("おや？　どこからか、猫の声が聞こえてきました。猫の方へ向かって、歩いてみましょう。", narrationClips[6]));
 
         // 移動を2回待つ
         moveCount = 0;
@@ -193,10 +210,10 @@ public class Tutorial1Controller : MonoBehaviour
 
         // --- ステップ4 ---
         // ナレーション：猫を捕まえるよう指示
-        yield return StartCoroutine(PlayInstruction("猫とあなたの間には、1マス分の壁があるようです。　１マス横に歩いて、壁の裏側に回り込み、猫をつかまえてみましょう！", narrationClips[3]));
+        yield return StartCoroutine(PlayInstruction("猫とあなたの間には、1マス分の壁があるようです。　１マス横に歩いて、壁の裏側に回り込み、猫をつかまえてみましょう！", narrationClips[7]));
 
         // タイマー付きで猫の捕捉を待機（制限時間30秒）
-        float timeLimit = 30f;
+        float timeLimit = 90f;
         float timer = 0f;
         bool catCaught = false;
 
@@ -231,14 +248,14 @@ public class Tutorial1Controller : MonoBehaviour
         if (catCaught)
         {
             // 成功時のナレーション
-            yield return StartCoroutine(PlayInstruction("みつけた！ 猫が近くにいます！（キャッチ音）以上でチュートリアルは完了です。", narrationClips[3]));
+            yield return StartCoroutine(PlayInstruction("みつけた！ 猫が近くにいます！（キャッチ音）以上でチュートリアルは完了です。", narrationClips[8]));
         }
         else
         {
-            // 失敗時のナレーション（narrationClips[4]があれば使用、なければテキストのみ）
-            if (narrationClips.Length > 4 && narrationClips[4] != null)
+            // 失敗時のナレーション（narrationClips[7]があれば使用、なければテキストのみ）
+            if (narrationClips[7] != null)
             {
-                yield return StartCoroutine(PlayInstruction("時間内に猫を見つけることができませんでした。次のステージで頑張ってください。", narrationClips[4]));
+                yield return StartCoroutine(PlayInstruction("時間内に猫を見つけることができませんでした。次のステージで頑張ってください。", narrationClips[8]));
             }
             else
             {
@@ -283,6 +300,10 @@ public class Tutorial1Controller : MonoBehaviour
         if (playerController2D != null)
         {
             playerController2D.enabled = enabled;
+            if (enabled)
+            {
+                playerController2D.ResetInputState();
+            }
         }
     }
 

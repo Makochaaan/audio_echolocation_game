@@ -119,6 +119,56 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &193730899
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 193730901}
+  - component: {fileID: 193730900}
+  m_Layer: 0
+  m_Name: SceneNameOverlay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &193730900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193730899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fc836bdf37efa945ac9838a22cddb35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showOnlySceneName: 1
+  allowToggle: 1
+  toggleKey: 94
+  fontAsset: {fileID: 0}
+  fontSize: 64
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!4 &193730901
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193730899}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.9791315, y: 0.29408836, z: -0.5383568}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &556380064
 GameObject:
   m_ObjectHideFlags: 0
@@ -182,7 +232,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  startupSound: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
+  startupSound: {fileID: 0}
   stillnessSound: {fileID: 0}
   completedBGM: {fileID: 0}
   cautionAudio: {fileID: 8300000, guid: e1b183525ba1f0948b201b31fedd75f7, type: 3}
@@ -256,7 +306,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
@@ -385,8 +435,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
-  m_Resource: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
+  m_Resource: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -519,7 +569,6 @@ MonoBehaviour:
   calibrationDelayTime: 3
   walkingCalibration: {fileID: 0}
   debugMode: 1
-  completionSound: {fileID: 0}
   narrationSound: {fileID: 0}
   audioSource: {fileID: 0}
 --- !u!4 &1669193914
@@ -546,3 +595,4 @@ SceneRoots:
   - {fileID: 969047839}
   - {fileID: 652645891}
   - {fileID: 1669193914}
+  - {fileID: 193730901}

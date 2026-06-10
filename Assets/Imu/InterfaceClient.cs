@@ -35,6 +35,7 @@ public class InterfaceClient : MonoBehaviour
     private readonly Queue<int> turnHistory = new Queue<int>();
     private int LEFTTURNSTATE = 1;
     private int RIGHTTURNSTATE = 0;
+    [SerializeField] private int maxTurnHistory = 1;
 
     //歩数をカウントする変数
     private int stepCount = 0;
@@ -97,6 +98,7 @@ public class InterfaceClient : MonoBehaviour
         if (nowYawDeg - baseYawDeg > turnThreshold)
         {
             baseYawDeg = nowYawDeg;
+            if (turnHistory.Count >= maxTurnHistory) turnHistory.Dequeue();
             turnHistory.Enqueue(LEFTTURNSTATE);
             if (debugMode)
             {
@@ -107,6 +109,7 @@ public class InterfaceClient : MonoBehaviour
         if (nowYawDeg - baseYawDeg < -turnThreshold)
         {
             baseYawDeg = nowYawDeg;
+            if (turnHistory.Count >= maxTurnHistory) turnHistory.Dequeue();
             turnHistory.Enqueue(RIGHTTURNSTATE);
             if (debugMode)
             {
@@ -206,6 +209,11 @@ public class InterfaceClient : MonoBehaviour
     public int GetStepCount()
     {
         return stepCount;
+    }
+
+    public void ClearTurnHistory()
+    {
+        turnHistory.Clear();
     }
     /// <summary>
     /// WalkingCalibrationInputSystemから利用される関数

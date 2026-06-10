@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerController2D : MonoBehaviour
 {
     [Header("移動設定")]
-    public float moveTime = 0.2f; // 1マス移動・方向転換にかかる時間
+    public float moveTime = 1.0f; // 1マス移動・方向転換にかかる時間
     public float gridSize = 1.0f; // 1マスのサイズ
     [Header("足音設定")]
     public AudioClip groundSound; // 土の足音
@@ -30,8 +30,14 @@ public class PlayerController2D : MonoBehaviour
     [Tooltip("インスペクターから、対象となる猫(CatGoal)オブジェクトを割り当ててください")]
     public CatGoalController catGoal; // 猫のスクリプトへの参照
     [Header("クリア設定")]
-    [Tooltip("猫を捕まえた時に鳴らす音")]
-    public AudioClip clearSound;
+    [Tooltip("クリア時に鳴らすBGM")]
+    public AudioClip clearBgm;
+    [Tooltip("クリア時に鳴らすナレーション")]
+    public AudioClip clearNarration;
+    [Tooltip("クリアBGM用AudioSource（未設定なら通常AudioSourceを使用）")]
+    public AudioSource clearBgmSource;
+    [Tooltip("クリアナレーション用AudioSource（未設定なら通常AudioSourceを使用）")]
+    public AudioSource clearNarrationSource;
     [Tooltip("クリア時に表示する文字などのUIオブジェクト（任意）")]
     public GameObject clearUI;
     [Header("操作設定")]
@@ -39,26 +45,54 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private bool useImuInput = true;
     [Tooltip("IMU入力のデバッグログを出す")]
     [SerializeField] private bool debugImuInput = true;
+    [Tooltip("最初の音声が流れている間は移動検知を停止する")]
+    [SerializeField] private bool blockInputWhileIntroAudio = true;
+    [Tooltip("最初の音声のAudioSource（2Dシーンの導入音声など）")]
+    [SerializeField] private AudioSource introAudioSource;
     [Tooltip("InterfaceClient への参照（IMU入力）")]
     [SerializeField] private InterfaceClient imuInterface;
     [Tooltip("キャリブレーション入力システム")]
     [SerializeField] private WalkingCalibrationInputSystem walkingCalibration;
+    [Tooltip("IMU移動後、フィードバック音が鳴るまでIMU受付を停止する")]
+    [SerializeField] private bool blockImuInputUntilFeedback = true;
+    [Tooltip("フィードバック音が鳴らない場合の解除タイムアウト（秒、0以下で無効）")]
+    [SerializeField] private float imuFeedbackTimeoutSeconds = 2.0f;
+    [Tooltip("IMU歩数の最大蓄積数")]
+    [SerializeField] private int maxImuStepAccumulation = 1;
     private Rigidbody rb;
     private AudioSource audioSource;
     private AudioSource bumpAudioSource; // 衝突・ノイズ音用の使い回すスピーカー
     private Echolocation echolocation;
     private bool isActing = false;
+    private bool bumpedSinceLastCheck = false;
+    private bool inputBlockedUntilRelease = false;
+    private bool wasIntroAudioPlaying = false;
+    private bool imuInputBlocked = false;
+    private Coroutine imuFeedbackTimeoutRoutine;
 
     private string currentGroundTag = "Untagged";
     private int currentTurnCount = 0;
     private int lastStepCount = 0;
+    private int pendingImuSteps = 0;
     void Start()
     {
     rb = GetComponent<Rigidbody>();
     rb.isKinematic = true;
     audioSource = GetComponent<AudioSource>();
+    if (clearBgmSource == null)
+    {
+    clearBgmSource = audioSource;
+    }
+    if (clearNarrationSource == null)
+    {
+    clearNarrationSource = audioSource;
+    }
     audioSource.spatialBlend = 0f;
     echolocation = GetComponent<Echolocation>();
+    if (echolocation != null)
+    {
+    echolocation.OnEchoFinished += HandleEchoFinished;
+    }
     transform.position = new Vector3(
     Mathf.Round(transform.position.x / gridSize) * gridSize,
     transform.position.y,
@@ -73,6 +107,14 @@ public class PlayerController2D : MonoBehaviour
     if (spatialMixerGroup != null)
     {
     bumpAudioSource.outputAudioMixerGroup = spatialMixerGroup;
+    }
+
+    void OnDestroy()
+    {
+    if (echolocation != null)
+    {
+    echolocation.OnEchoFinished -= HandleEchoFinished;
+    }
     }
     // Resonance Audio向けのコンポーネントが存在すれば自動追加して高精度化する
     System.Type resonanceType = System.Type.GetType("ResonanceAudioSource");
@@ -98,7 +140,34 @@ public class PlayerController2D : MonoBehaviour
     }
     void Update()
     {
-    if (isActing) return;
+    if (blockInputWhileIntroAudio && introAudioSource != null)
+    {
+    if (introAudioSource.isPlaying)
+    {
+    wasIntroAudioPlaying = true;
+    return;
+    }
+    if (wasIntroAudioPlaying)
+    {
+    wasIntroAudioPlaying = false;
+    ResetInputState();
+    }
+    }
+    if (isActing)
+    {
+    return;
+    }
+    if (inputBlockedUntilRelease)
+    {
+    if (!HasKeyboardInput())
+    {
+    inputBlockedUntilRelease = false;
+    }
+    else
+    {
+    return;
+    }
+    }
     // ★追加：クリア判定（プレイヤーと猫が同じ座標にいるか）
     if (catGoal != null && catGoal.gameObject.activeInHierarchy)
     {
@@ -125,6 +194,11 @@ public class PlayerController2D : MonoBehaviour
     if (debugImuInput) Debug.LogWarning("[PlayerController2D] IMU skipped: imuInterface is null.");
     return false;
     }
+    if (blockImuInputUntilFeedback && imuInputBlocked)
+    {
+    if (debugImuInput) Debug.Log("[PlayerController2D] IMU blocked: waiting for feedback audio.");
+    return false;
+    }
     bool calibrated = (walkingCalibration != null && walkingCalibration.IsCalibrated)
         || WalkingCalibrationInputSystem.HasPersistedCalibration;
     if (!calibrated)
@@ -148,9 +222,15 @@ public class PlayerController2D : MonoBehaviour
     int currentStepCount = imuInterface.GetStepCount();
     if (currentStepCount > lastStepCount)
     {
-    if (debugImuInput) Debug.Log($"[PlayerController2D] IMU step detected: last={lastStepCount}, current={currentStepCount}");
+    int deltaSteps = currentStepCount - lastStepCount;
+    pendingImuSteps = Mathf.Min(maxImuStepAccumulation, pendingImuSteps + deltaSteps);
+    if (debugImuInput) Debug.Log($"[PlayerController2D] IMU step detected: last={lastStepCount}, current={currentStepCount}, pending={pendingImuSteps}");
     lastStepCount = currentStepCount;
-    StartCoroutine(MoveGrid(transform.forward));
+    }
+    if (pendingImuSteps > 0)
+    {
+    pendingImuSteps--;
+    StartCoroutine(MoveGrid(transform.forward, true));
     return true;
     }
     if (debugImuInput) Debug.Log($"[PlayerController2D] IMU ready but no action: turnState={turnState}, stepCount={currentStepCount}");
@@ -188,31 +268,52 @@ public class PlayerController2D : MonoBehaviour
     float angleDifference = Vector3.Angle(transform.forward, inputDirection);
     if (angleDifference < 1.0f)
     {
-    StartCoroutine(MoveGrid(inputDirection));
+    StartCoroutine(MoveGrid(inputDirection, false));
     }
     else
     {
     StartCoroutine(TurnGrid(inputDirection));
     }
     }
+
+    }
+
+    bool HasKeyboardInput()
+    {
+    if (Keyboard.current == null) return false;
+    return Keyboard.current.leftArrowKey.isPressed ||
+    Keyboard.current.rightArrowKey.isPressed ||
+    Keyboard.current.upArrowKey.isPressed ||
+    Keyboard.current.downArrowKey.isPressed ||
+    Keyboard.current.aKey.isPressed ||
+    Keyboard.current.dKey.isPressed ||
+    Keyboard.current.wKey.isPressed ||
+    Keyboard.current.sKey.isPressed;
     }
     // ★追加：ゲームクリア時の演出とシーン遷移
     IEnumerator GameClearRoutine()
     {
     isActing = true; // 以降の操作を完全にロック
-    // 猫を捕まえた音（ニャー！やファンファーレ等）を鳴らす
-    if (clearSound != null && audioSource != null)
+    // クリアBGMとナレーションを鳴らす
+    if (clearBgm != null && clearBgmSource != null)
     {
-    audioSource.PlayOneShot(clearSound);
+    clearBgmSource.clip = clearBgm;
+    clearBgmSource.loop = false;
+    clearBgmSource.Play();
+    }
+    if (clearNarration != null && clearNarrationSource != null)
+    {
+    clearNarrationSource.PlayOneShot(clearNarration);
     }
     // クリアテキストなどのUIを表示
     if (clearUI != null)
     {
     clearUI.SetActive(true);
     }
-    // 3秒間余韻を残して、スタートシーンへ戻る
-    yield return new WaitForSeconds(3.0f);
-    UnityEngine.SceneManagement.SceneManager.LoadScene("StartScene");
+    // BGM終了後に3秒待って待機シーンへ戻る
+    float waitTime = (clearBgm != null) ? clearBgm.length : 0f;
+    yield return new WaitForSeconds(waitTime + 3.0f);
+    UnityEngine.SceneManagement.SceneManager.LoadScene("1. WaitingScene");
     }
     void EndTurn()
     {
@@ -222,9 +323,13 @@ public class PlayerController2D : MonoBehaviour
     catGoal.TakeTurn();
     }
     }
-    IEnumerator MoveGrid(Vector3 direction)
+    IEnumerator MoveGrid(Vector3 direction, bool fromImu)
     {
     isActing = true;
+    if (fromImu)
+    {
+    BeginImuFeedbackBlock();
+    }
     Vector3 targetPosition = transform.position + direction * gridSize;
     Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
     if (Physics.Raycast(rayOrigin, direction, out RaycastHit hit, gridSize))
@@ -235,7 +340,7 @@ public class PlayerController2D : MonoBehaviour
     yield break;
     }
     CheckGroundMaterial();
-    PlayStepSound();
+    float stepClipLength = PlayStepSound();
     Vector3 startPosition = transform.position;
     float elapsedTime = 0f;
     while (elapsedTime < moveTime)
@@ -245,6 +350,10 @@ public class PlayerController2D : MonoBehaviour
         yield return null;
     }
     transform.position = targetPosition;
+    if (stepClipLength > moveTime)
+    {
+        yield return new WaitForSeconds(stepClipLength - moveTime);
+    }
     if (echolocation != null)
     {
         echolocation.TriggerSonar();
@@ -286,6 +395,7 @@ public class PlayerController2D : MonoBehaviour
     }
     IEnumerator HandleBump(Vector3 position, string hitTag)
     {
+    bumpedSinceLastCheck = true;
     bumpAudioSource.transform.position = position;
     if (bumpSound != null)
     {
@@ -302,28 +412,88 @@ public class PlayerController2D : MonoBehaviour
     yield return null;
     }
     bumpAudioSource.Stop();
+    NotifyFeedbackEnded();
     }
     else
     {
     if (bumpSound != null) yield return new WaitForSeconds(bumpSound.length);
+    NotifyFeedbackEnded();
     }
     }
-    void PlayStepSound()
+
+    public bool ConsumeBumpSignal()
     {
-    if (audioSource == null) return;
+    if (!bumpedSinceLastCheck) return false;
+    bumpedSinceLastCheck = false;
+    return true;
+    }
+
+    public void ResetInputState()
+    {
+    inputBlockedUntilRelease = true;
+    ClearImuFeedbackBlock();
+    }
+
+    void BeginImuFeedbackBlock()
+    {
+    if (!blockImuInputUntilFeedback) return;
+    imuInputBlocked = true;
+    if (imuFeedbackTimeoutRoutine != null)
+    {
+    StopCoroutine(imuFeedbackTimeoutRoutine);
+    }
+    if (imuFeedbackTimeoutSeconds > 0f)
+    {
+    imuFeedbackTimeoutRoutine = StartCoroutine(ImuFeedbackTimeout());
+    }
+    }
+
+    IEnumerator ImuFeedbackTimeout()
+    {
+    yield return new WaitForSeconds(imuFeedbackTimeoutSeconds);
+    ClearImuFeedbackBlock();
+    }
+
+    void NotifyFeedbackEnded()
+    {
+    if (!imuInputBlocked) return;
+    ClearImuFeedbackBlock();
+    }
+
+    void ClearImuFeedbackBlock()
+    {
+    imuInputBlocked = false;
+    if (imuFeedbackTimeoutRoutine != null)
+    {
+    StopCoroutine(imuFeedbackTimeoutRoutine);
+    imuFeedbackTimeoutRoutine = null;
+    }
+    }
+
+    void HandleEchoFinished()
+    {
+    NotifyFeedbackEnded();
+    }
+    float PlayStepSound()
+    {
+    if (audioSource == null) return 0f;
     if (currentGroundTag == "Ground" && groundSound != null)
     {
     audioSource.PlayOneShot(groundSound);
+    return groundSound.length;
     }
     else if (currentGroundTag == "Metal" && metalSound != null)
     {
     audioSource.PlayOneShot(metalSound);
+    return metalSound.length;
     }
     else if (groundSound != null)
     {
     // 壁に寄って床タグが取れない場合でも足音を鳴らす
     audioSource.PlayOneShot(groundSound);
+    return groundSound.length;
     }
+    return 0f;
     }
     void CheckGroundMaterial()
     {

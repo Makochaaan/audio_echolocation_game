@@ -11,6 +11,7 @@ public class DetectAdjusting : MonoBehaviour
 
     [Tooltip("静止状態を判定する時間（秒）")]
     public float stillnessDuration = 5.0f;
+    private float narrationWaitDuration = 25.0f;
 
     [Tooltip("デバッグモード")]
     public bool debugMode = true;
@@ -80,6 +81,7 @@ public class DetectAdjusting : MonoBehaviour
     {
         if (cautionAudioIsPlayed) DetectCautionAudioEnd();
         if (LinearAccelerationSensor.current == null) return;
+        if (narrationWaitDuration > 0f) narrationWaitDuration -= Time.deltaTime;
 
         // if (cautionAudioSource.isPlaying && !cautionAudioIsPlayed) return;
 
@@ -96,7 +98,7 @@ public class DetectAdjusting : MonoBehaviour
         }
 
         // 加速度が閾値以下 = 静止状態
-        if (mag < stillnessThreshold)
+        if (mag < stillnessThreshold && narrationWaitDuration <= 0f)
         {
             // 静止状態が開始していなければ記録
             if (!isCurrentlyStill)
