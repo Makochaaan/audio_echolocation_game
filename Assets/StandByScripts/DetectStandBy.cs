@@ -3,176 +3,99 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
+// WaitingScene 用: 端末を所定の向き（z ≈ -1g）で静止保持し続けたら
+// ゲーム開始トリガーとして次シーンへ遷移する。
+// 検出ロジックは test_android_IMU プロジェクトの DetectStandBy を踏襲。
 public class DetectStandBy : MonoBehaviour
 {
-    [Header("Vibration Detection")]
-    [Tooltip("検知する線形加速度の閾値 (m/s^2) 。ヘッドフォン装着振動は通常小さいので調整して下さい。")]
-    public float vibrationThreshold = 0.005f;
+    [Header("StandBy Detection (IMU)")]
+    [Tooltip("ゲーム開始までに静止保持が必要な秒数（デフォルト5秒）")]
+    [SerializeField] private float standByThres = 5.0f;
 
-    [Tooltip("検知後に再検知するまでのクールダウン（秒）")]
-    public float detectionCooldown = 0.5f;
+    [Tooltip("正規化した重力方向 z の上限（-1g 付近を上向き判定。0に近いほど許容が緩い）")]
+    [SerializeField] private float zMaxThres = -0.9f;
 
-    [Tooltip("デバッグモード")]
-    public bool debugMode = true;
+    [Tooltip("正規化した重力方向 z の下限（正規化後は最小 -1 なので実質は安全マージン）")]
+    [SerializeField] private float zMinThres = -1.1f;
 
-    [Tooltip("デバッグログの出力間隔（秒）。0なら毎フレーム出力")]
-    public float debugLogInterval = 0.5f;
+    [Tooltip("静止とみなす線形加速度の大きさの上限")]
+    [SerializeField] private float magThres = 0.1f;
 
-    [Header("Events")]
-    public UnityEvent onVibrationDetected;
+    [Header("Transition")]
+    [Tooltip("静止保持が完了したら遷移するシーン名")]
+    [SerializeField] private string nextSceneName = "2. AdjustingScene";
 
-    [Header("Auto Transition")]
-    [Tooltip("検知処理を無効化し、一定時間後に自動遷移する")]
-    public bool autoTransitionOnly = true;
+    [Tooltip("遷移直前に追加で呼びたい処理があれば登録")]
+    public UnityEvent onStandByComplete;
 
-    [Tooltip("自動遷移までの待ち時間（秒）")]
-    public float autoTransitionDelay = 10.0f;
+    [Header("Debug")]
+    [SerializeField] private bool debugMode = true;
 
-    [Header("Orientation Detection")]
-    [Tooltip("縦向きに保持された場合に検出を行うか。true のとき加速度検知の代わりに使用します。")]
-    public bool useOrientationDetection = true;
+    [Tooltip("デバッグログの出力間隔（秒）。0なら毎フレーム")]
+    [SerializeField] private float debugLogInterval = 0.5f;
 
-    [Tooltip("+Y 方向を向いていると判定する許容角度（度）")]
-    public float upwardAngleThreshold = 25.0f;
-
-    [Tooltip("向き判定に使う加速度の平滑化係数（0.01〜1.0）。小さいほど安定")]
-    [Range(0.01f, 1.0f)]
-    public float orientationSmoothing = 0.1f;
-
-    [Tooltip("向き判定に使う最小加速度の大きさ。これ未満は角度計算しない")]
-    public float minOrientationAccel = 0.2f;
-
-    [Tooltip("縦向きが保持される必要がある秒数")]
-    public float requiredHoldSeconds = 2.0f;
-
-    // 内部ステート: 縦向きが始まった時刻
-    private float orientationStartTime = -10f;
-
-    private float lastDetectTime = -10f;
-
+    private Vector3 accel = Vector3.zero;
+    private Vector3 linearAccel = Vector3.zero;
+    private float standByDuration = 0.0f;
     private float lastDebugLogTime = -999f;
-
-    private Vector3 smoothedAcc = Vector3.zero;
-
-    private float standbyStartTime = -10f;
-    private bool hasAutoTransitioned = false;
+    private bool hasTriggered = false;
 
     void Start()
     {
-        standbyStartTime = Time.time;
-
-        // Accelerometer を有効化（ある場合）
         if (Accelerometer.current != null)
-        {
             InputSystem.EnableDevice(Accelerometer.current);
-        }
 
-        // LinearAccelerationSensor を有効化（ある場合）
+        if (UnityEngine.InputSystem.Gyroscope.current != null)
+            InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
+
+        if (AttitudeSensor.current != null)
+            InputSystem.EnableDevice(AttitudeSensor.current);
+
         if (LinearAccelerationSensor.current != null)
         {
             InputSystem.EnableDevice(LinearAccelerationSensor.current);
+            if (debugMode) Debug.Log("[DetectStandBy] LinearAccelerationSensor available");
+        }
+        else if (debugMode)
+        {
+            Debug.Log("[DetectStandBy] LinearAccelerationSensor not available");
         }
     }
 
     void Update()
     {
-        if (autoTransitionOnly)
-        {
-            if (!hasAutoTransitioned && Time.time - standbyStartTime >= autoTransitionDelay)
-            {
-                hasAutoTransitioned = true;
-                if (debugMode) Debug.Log($"[DetectStandBy] Auto transition after {autoTransitionDelay} s.");
-                onVibrationDetected?.Invoke();
-                SceneManager.LoadScene("2. AdjustingScene");
-            }
+        if (hasTriggered) return;
 
-            return;
+        if (Accelerometer.current != null)
+            accel = Accelerometer.current.acceleration.ReadValue();
+
+        if (LinearAccelerationSensor.current != null)
+            linearAccel = LinearAccelerationSensor.current.acceleration.ReadValue();
+
+        // 重力加速度を正規化し、向き（z成分）だけで判定する。
+        // こうすると実機ごとの 1g の誤差（例: -1.021）に左右されない。
+        float gravityZ = accel.normalized.z;
+        bool isStandBy = zMinThres <= gravityZ && gravityZ <= zMaxThres
+                         && linearAccel.magnitude <= magThres;
+
+        if (isStandBy)
+            standByDuration += Time.deltaTime;
+        else
+            standByDuration = 0.0f;
+
+        if (debugMode && (debugLogInterval <= 0f || Time.time - lastDebugLogTime >= debugLogInterval))
+        {
+            Debug.Log($"[DetectStandBy] accel.z={accel.z:F3}, gz={gravityZ:F3}, mag={linearAccel.magnitude:F3}, " +
+                      $"standby={isStandBy}, duration={standByDuration:F2}/{standByThres:F1}");
+            lastDebugLogTime = Time.time;
         }
 
-        // オリエンテーション検出が有効ならそちらを優先
-        if (useOrientationDetection)
+        if (standByDuration >= standByThres)
         {
-            if (Accelerometer.current == null)
-                return;
-
-            Vector3 acc = Accelerometer.current.acceleration.ReadValue();
-            smoothedAcc = Vector3.Lerp(smoothedAcc, acc, orientationSmoothing);
-            float accMag = smoothedAcc.magnitude;
-            bool isPortrait = false;
-
-            if (accMag > minOrientationAccel)
-            {
-                float angleToUp = Vector3.Angle(smoothedAcc / accMag, Vector3.up);
-                isPortrait = angleToUp <= upwardAngleThreshold;
-            }
-
-            if (debugMode)
-            {
-                if (debugLogInterval <= 0f || Time.time - lastDebugLogTime >= debugLogInterval)
-                {
-                    float heldSeconds = orientationStartTime >= 0f ? (Time.time - orientationStartTime) : 0f;
-                    float angleToUp = accMag > minOrientationAccel ? Vector3.Angle(smoothedAcc / accMag, Vector3.up) : 999f;
-                    Debug.Log($"[DetectStandBy] isUpward={isPortrait}, acc=({acc.x:F3},{acc.y:F3},{acc.z:F3}), smooth=({smoothedAcc.x:F3},{smoothedAcc.y:F3},{smoothedAcc.z:F3}), angleToUp={angleToUp:F1}, held={heldSeconds:F2}");
-                    lastDebugLogTime = Time.time;
-                }
-            }
-
-            if (isPortrait)
-            {
-                if (orientationStartTime < 0)
-                    orientationStartTime = Time.time;
-
-                if (Time.time - orientationStartTime >= requiredHoldSeconds && Time.time - lastDetectTime > detectionCooldown)
-                {
-                    lastDetectTime = Time.time;
-                    orientationStartTime = -10f;
-                    if (debugMode) Debug.Log($"[DetectStandBy] Orientation held for {requiredHoldSeconds} s. Triggering.");
-                    onVibrationDetected?.Invoke();
-                    SceneManager.LoadScene("2. AdjustingScene");
-                }
-            }
-            else
-            {
-                // 縦向きでなくなったらタイマーをリセット
-                orientationStartTime = -10f;
-            }
-
-            return;
+            hasTriggered = true;
+            if (debugMode) Debug.Log("[DetectStandBy] StandBy complete -> start game!");
+            onStandByComplete?.Invoke();
+            SceneManager.LoadScene(nextSceneName);
         }
-
-        // 通常の振動（線形加速度）検出（オプション）
-        if (LinearAccelerationSensor.current == null)
-            return;
-
-        Vector3 lin = LinearAccelerationSensor.current.acceleration.ReadValue();
-
-        // 線形加速度の大きさを使って振動を検出
-        float mag = lin.magnitude;
-
-        if (debugMode)
-        {
-            if (debugLogInterval <= 0f || Time.time - lastDebugLogTime >= debugLogInterval)
-            {
-                Debug.Log($"[DetectStandBy] lin=({lin.x:F3},{lin.y:F3},{lin.z:F3}), mag={mag:F3}, threshold={vibrationThreshold:F3}");
-                lastDebugLogTime = Time.time;
-            }
-        }
-
-        if (mag > vibrationThreshold && Time.time - lastDetectTime > detectionCooldown)
-        {
-            lastDetectTime = Time.time;
-            if (debugMode) Debug.Log($"[DetectStandBy] Vibration detected. mag={mag:F3}");
-            onVibrationDetected?.Invoke();
-            SceneManager.LoadScene("2. AdjustingScene");
-        }
-    }
-
-    /// <summary>
-    /// 外部から振動検知を強制トリガーするユーティリティ
-    /// </summary>
-    public void TriggerVibration()
-    {
-        lastDetectTime = Time.time;
-        onVibrationDetected?.Invoke();
     }
 }
