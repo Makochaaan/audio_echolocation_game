@@ -232,10 +232,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  startupSound: {fileID: 0}
+  startupSound: {fileID: 8300000, guid: ebababae148f840cea4511ef94a3de4b, type: 3}
   stillnessSound: {fileID: 0}
   completedBGM: {fileID: 0}
-  cautionAudio: {fileID: 8300000, guid: e1b183525ba1f0948b201b31fedd75f7, type: 3}
+  cautionAudio: {fileID: 8300000, guid: 3f0e4570995d44793894fdf83c29a57c, type: 3}
   bgAudioSource: {fileID: 1566038538}
   cautionAudioSource: {fileID: 969047838}
   calibrationController: {fileID: 1669193913}
@@ -307,7 +307,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -435,8 +435,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
-  m_Resource: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

@@ -57,15 +57,11 @@ public class DetectAdjusting : MonoBehaviour
         }
 
         // AudioSource の初期化: bg 用と caution 用を用意
-        if (bgAudioSource == null)
-        {
-            bgAudioSource.clip = startupSound;
-            bgAudioSource.Play();
-        }
-
         if (bgAudioSource != null)
         {
+            bgAudioSource.clip = startupSound;
             bgAudioSource.loop = true;
+            bgAudioSource.Play();
         }
 
         if (cautionAudioSource == null)
