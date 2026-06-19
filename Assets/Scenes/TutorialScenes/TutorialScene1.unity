@@ -567,7 +567,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
+  spatialMixerGroup: {fileID: 24300002, guid: b3759d28953664aa48c4205be41a7c49, type: 2}
   applyReverb: 1
   reverbPreset: 9
   reverbLevel: -1000
@@ -588,14 +588,14 @@ MonoBehaviour:
   gridSize: 1
   groundSound: {fileID: 8300000, guid: f3587a31ff3cc414da92ae576772194e, type: 3}
   metalSound: {fileID: 8300000, guid: f3587a31ff3cc414da92ae576772194e, type: 3}
-  turnSound: {fileID: 8300000, guid: 4af21e7ff32e45e42a71cdb38faed63e, type: 3}
-  turnRightSound: {fileID: 8300000, guid: 4af21e7ff32e45e42a71cdb38faed63e, type: 3}
-  turnLeftSound: {fileID: 8300000, guid: 710375a44d376294d8130a26cb550240, type: 3}
+  turnSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
+  turnRightSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
+  turnLeftSound: {fileID: 8300000, guid: 8683cdda8480940b088615125883129c, type: 3}
   bumpSound: {fileID: 8300000, guid: 3f1e0a0dec0287344b0dc37e9dce3f84, type: 3}
   sustainNoiseSound: {fileID: 8300000, guid: 140a2c4e3a941ad41a9e667997b5574d, type: 3}
   sustainDurationTurns: 2
   consumeTurnOnBump: 1
-  spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
+  spatialMixerGroup: {fileID: 24300002, guid: b3759d28953664aa48c4205be41a7c49, type: 2}
   catGoal: {fileID: 0}
   clearBgm: {fileID: 0}
   clearPreNarration: {fileID: 0}
@@ -895,7 +895,7 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 1
+  Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
