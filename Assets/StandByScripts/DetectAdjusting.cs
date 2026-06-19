@@ -76,6 +76,13 @@ public class DetectAdjusting : MonoBehaviour
     void Update()
     {
         if (cautionAudioIsPlayed) DetectCautionAudioEnd();
+
+        // 一度静止検知してSF3を再生したら、以降は静止判定を行わない。
+        // これを入れないと、検知後も毎フレーム判定が続き、静止し続けている限り
+        // 5秒ごとに「Stillness detected」が再発火するループになる。
+        // （SF3再生の監視＝DetectCautionAudioEnd はこの上で毎フレーム継続する）
+        if (hasTriggeredSF3) return;
+
         if (LinearAccelerationSensor.current == null) return;
         if (narrationWaitDuration > 0f) narrationWaitDuration -= Time.deltaTime;
 
