@@ -16,9 +16,6 @@ public class CalibrationController : MonoBehaviour
     public bool debugMode = true;
 
     [Header("Audio Settings")]
-    [Tooltip("キャリブレーション完了時の効果音")]
-    public AudioClip completionSound;
-
     [Tooltip("キャリブレーション完了後のナレーション")]
     public AudioClip narrationSound;
 
@@ -30,7 +27,7 @@ public class CalibrationController : MonoBehaviour
     void Start()
     {
         // 起動と同時に音声を再生してキャリブレーション開始処理を実行
-        if (audioSource != null && completionSound != null)
+        if (audioSource != null)
         {
             audioSource.Play();
             if (debugMode) Debug.Log("[CalibrationController] Startup sound playing");
@@ -81,16 +78,15 @@ public class CalibrationController : MonoBehaviour
             audioSource.Stop();
 
         // 完了音声を再生
-        if (audioSource != null && completionSound != null && narrationSound != null)
+        if (audioSource != null && narrationSound != null)
         {
-            audioSource.PlayOneShot(completionSound);
             if (debugMode) Debug.Log("[CalibrationController] Completion sound playing");
 
             audioSource.PlayOneShot(narrationSound);
         }
 
         // 完了音声の再生時間だけ遅延してからシーン遷移
-        float delayTime = completionSound != null ? completionSound.length : 1.0f;
+        float delayTime = narrationSound != null ? narrationSound.length : 1.0f;
         Invoke(nameof(TransitionToNextScene), delayTime);
     }
 

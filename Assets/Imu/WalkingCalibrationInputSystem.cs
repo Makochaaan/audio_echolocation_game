@@ -11,7 +11,7 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
     public static float PersistedStd { get; private set; } = 0.0f;
 
     [Header("Calibration Settings")]
-    [SerializeField] private float calibrationDuration = 10.0f;
+    [SerializeField] private float calibrationDuration = 15.0f;
     [SerializeField] private float clipDuration = 1.0f;
 
     [Header("Smoothing Settings")]
