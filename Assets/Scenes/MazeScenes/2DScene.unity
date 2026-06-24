@@ -297,8 +297,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: bcbc583a21408134d92ae5c60d6bd617, type: 3}
-  m_Resource: {fileID: 8300000, guid: bcbc583a21408134d92ae5c60d6bd617, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -1023,8 +1023,7 @@ MonoBehaviour:
   consumeTurnOnBump: 1
   spatialMixerGroup: {fileID: 24300002, guid: 5d8ef5a059a100445ab7bbf0250f5f06, type: 2}
   catGoal: {fileID: 1283935693}
-  clearBgm: {fileID: 8300000, guid: 172b2370dd8dfbd49a4f7a96db16e0d7, type: 3}
-  clearPreNarration: {fileID: 8300000, guid: 599c482fa69a66d4bb004aeea871ea9f, type: 3}
+  clearBgm: {fileID: 8300000, guid: 78aad48eec3c74491a08e4bcef37d220, type: 3}
   clearNarration: {fileID: 8300000, guid: 8990a505154e29044918b54f6234061b, type: 3}
   clearBgmSource: {fileID: 1265943437}
   clearNarrationSource: {fileID: 1265943437}
@@ -1035,8 +1034,9 @@ MonoBehaviour:
   introAudioSource: {fileID: 376694522}
   imuInterface: {fileID: 1640743964}
   walkingCalibration: {fileID: 1688017152}
-  blockImuInputUntilFeedback: 1
+  blockImuInputUntilFeedback: 0
   imuFeedbackTimeoutSeconds: 2
+  maxImuStepAccumulation: 1
 --- !u!82 &1265943437
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2148,6 +2148,7 @@ MonoBehaviour:
   alpha: 0.1
   walkingThredhold: 0.04
   debugMode: 1
+  maxTurnHistory: 1
 --- !u!4 &1640743965
 Transform:
   m_ObjectHideFlags: 0

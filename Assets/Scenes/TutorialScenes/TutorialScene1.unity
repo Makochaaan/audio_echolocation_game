@@ -364,6 +364,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c4f6da24debf34b808c5fc8fa66819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serverIp: 192.168.11.5
+  pollInterval: 0.1
 --- !u!4 &774518484
 Transform:
   m_ObjectHideFlags: 0
@@ -391,6 +393,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c53b5ccfb664dc42bab3ca03a901b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MAXLEN: 50
+  turnThreshold: 60
+  resetThreshold: 0.5
+  alpha: 0.1
+  walkingThredhold: 0.04
+  debugMode: 0
+  maxTurnHistory: 1
 --- !u!1 &1086414774
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,7 +599,6 @@ MonoBehaviour:
   spatialMixerGroup: {fileID: 0}
   catGoal: {fileID: 0}
   clearBgm: {fileID: 0}
-  clearPreNarration: {fileID: 0}
   clearNarration: {fileID: 0}
   clearBgmSource: {fileID: 0}
   clearNarrationSource: {fileID: 0}
@@ -603,6 +611,7 @@ MonoBehaviour:
   walkingCalibration: {fileID: 1351178931}
   blockImuInputUntilFeedback: 1
   imuFeedbackTimeoutSeconds: 2
+  maxImuStepAccumulation: 1
 --- !u!82 &1265943437
 AudioSource:
   m_ObjectHideFlags: 0
@@ -836,6 +845,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef5e1719799ca4f9b9f5db81449517ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bypassRoomEffects: 0
+  directivityAlpha: 0
+  directivitySharpness: 1
+  listenerDirectivityAlpha: 0
+  listenerDirectivitySharpness: 1
+  gainDb: 0
+  nearFieldEffectEnabled: 0
+  nearFieldEffectGain: 1
+  occlusionEnabled: 0
+  occlusionIntensity: 1
+  quality: 2
 --- !u!1 &1283935684
 GameObject:
   m_ObjectHideFlags: 0
@@ -1093,6 +1113,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef5e1719799ca4f9b9f5db81449517ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bypassRoomEffects: 0
+  directivityAlpha: 0
+  directivitySharpness: 1
+  listenerDirectivityAlpha: 0
+  listenerDirectivitySharpness: 1
+  gainDb: 0
+  nearFieldEffectEnabled: 0
+  nearFieldEffectGain: 1
+  occlusionEnabled: 0
+  occlusionIntensity: 1
+  quality: 2
 --- !u!114 &1283935695
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1244,6 +1275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e4c5ab309bbde47859b09dcad79c65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnReceiver: {fileID: 0}
 --- !u!4 &1351178930
 Transform:
   m_ObjectHideFlags: 0
@@ -1378,6 +1410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22d8d3efb64a4f4187d83b5ca9c48e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  offset: {x: 0, y: 6, z: -6}
 --- !u!114 &1537814753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1457,16 +1490,15 @@ MonoBehaviour:
   instructionText: {fileID: 406319088}
   narratorSource: {fileID: 1265943437}
   narrationClips:
-  - {fileID: 8300000, guid: befe868bd66069f469f1533bfbd15448, type: 3}
-  - {fileID: 8300000, guid: cc675b49fa879834a9a53e95014d7981, type: 3}
+  - {fileID: 8300000, guid: 62a28222d16744ad4bd35ffead535762, type: 3}
+  - {fileID: 0}
   - {fileID: 8300000, guid: 5790417b3f60f1f45b70bed1f3ea72e9, type: 3}
   - {fileID: 8300000, guid: 8918c4c1ff5d00f4bb3020649cd170c8, type: 3}
-  - {fileID: 8300000, guid: 8faf7e8f400c49d4db68e87ec40ba531, type: 3}
-  - {fileID: 8300000, guid: 0fb8eb524d9dccc44bcb1a1c1d481e9e, type: 3}
-  - {fileID: 8300000, guid: 624ac85d66fdf4e429c236535b993a1a, type: 3}
-  - {fileID: 8300000, guid: c58931d48b0310640afe93477cc73d27, type: 3}
-  - {fileID: 8300000, guid: c0a9507227a27a345934ec4d6928c5b0, type: 3}
-  catCaughtPreNarrationClip: {fileID: 8300000, guid: a9b8276bfb9f11746a66bf6dcf0ba7d4, type: 3}
+  - {fileID: 8300000, guid: 478c9020f8796466e8431d0ce40e61a3, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   bumpDetectDistance: 0.55
 --- !u!1 &1664877945
 GameObject:
