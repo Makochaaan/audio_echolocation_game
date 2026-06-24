@@ -232,10 +232,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  startupSound: {fileID: 0}
+  startupSound: {fileID: 8300000, guid: ebababae148f840cea4511ef94a3de4b, type: 3}
   stillnessSound: {fileID: 0}
   completedBGM: {fileID: 0}
-  cautionAudio: {fileID: 8300000, guid: e1b183525ba1f0948b201b31fedd75f7, type: 3}
+  cautionAudio: {fileID: 8300000, guid: 3f0e4570995d44793894fdf83c29a57c, type: 3}
   bgAudioSource: {fileID: 1566038538}
   cautionAudioSource: {fileID: 969047838}
   calibrationController: {fileID: 1669193913}
@@ -289,6 +289,7 @@ GameObject:
   m_Component:
   - component: {fileID: 969047839}
   - component: {fileID: 969047838}
+  - component: {fileID: 969047840}
   m_Layer: 0
   m_Name: cautionAudioSource
   m_TagString: Untagged
@@ -307,13 +308,13 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: fedd387ebc2de814285b75327c3cac37, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
-  Spatialize: 1
+  Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
@@ -408,6 +409,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &969047840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 969047837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f07e88724f19d442bf039b33a6d2707, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  logInterval: 0.5
+  logToConsole: 1
+  showOnScreen: 1
+  panelSlot: 1
+  monitorListener: 1
 --- !u!1 &1566038537
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,6 +437,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1566038539}
   - component: {fileID: 1566038538}
+  - component: {fileID: 1566038540}
   m_Layer: 0
   m_Name: bgAudioSource
   m_TagString: Untagged
@@ -435,14 +455,14 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
-  m_Resource: {fileID: 8300000, guid: 4483057ce3a43b3429dbecd680b36670, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
-  Spatialize: 1
+  Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
@@ -537,6 +557,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1566038540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566038537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f07e88724f19d442bf039b33a6d2707, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  logInterval: 0.5
+  logToConsole: 1
+  showOnScreen: 1
+  panelSlot: 0
+  monitorListener: 1
 --- !u!1 &1669193912
 GameObject:
   m_ObjectHideFlags: 0

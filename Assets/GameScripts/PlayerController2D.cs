@@ -109,13 +109,6 @@ public class PlayerController2D : MonoBehaviour
     bumpAudioSource.outputAudioMixerGroup = spatialMixerGroup;
     }
 
-    void OnDestroy()
-    {
-    if (echolocation != null)
-    {
-    echolocation.OnEchoFinished -= HandleEchoFinished;
-    }
-    }
     // Resonance Audio向けのコンポーネントが存在すれば自動追加して高精度化する
     System.Type resonanceType = System.Type.GetType("ResonanceAudioSource");
     if (resonanceType != null)
@@ -138,6 +131,18 @@ public class PlayerController2D : MonoBehaviour
     Debug.Log($"[PlayerController2D] Start: useImuInput={useImuInput}, mobile={Application.isMobilePlatform}, imuInterface={(imuInterface != null)}, walkingCalibration={(walkingCalibration != null)}, persistedCalibration={WalkingCalibrationInputSystem.HasPersistedCalibration}");
     }
     }
+
+    // 破棄時にイベント購読を解除する。
+    // Unityのライフサイクルとして呼ばれるよう、必ずクラス直下のメソッドにする
+    //（Start内のローカル関数だと呼ばれず、購読が解除されないままになる）
+    void OnDestroy()
+    {
+    if (echolocation != null)
+    {
+    echolocation.OnEchoFinished -= HandleEchoFinished;
+    }
+    }
+
     void Update()
     {
     if (blockInputWhileIntroAudio && introAudioSource != null)

@@ -23,6 +23,10 @@ public class CalibrationController : MonoBehaviour
     public AudioSource audioSource;
 
     private bool calibrationCompleted = false;
+    // 実際にこのシーンでキャリブレーションを開始したか。
+    // WalkingCalibration.Start() が前回結果を復元して IsCalibrated=true にすると、
+    // 開始前に即完了扱いになりキャリブレーションがスキップされる。それを防ぐガード。
+    private bool calibrationStarted = false;
 
     void Start()
     {
@@ -38,7 +42,7 @@ public class CalibrationController : MonoBehaviour
     void Update()
     {
         // キャリブレーション完了を監視
-        if (!calibrationCompleted && walkingCalibration != null && walkingCalibration.IsCalibrated)
+        if (!calibrationCompleted && calibrationStarted && walkingCalibration != null && walkingCalibration.IsCalibrated)
         {
             calibrationCompleted = true;
             OnCalibrationCompleted();
@@ -63,6 +67,7 @@ public class CalibrationController : MonoBehaviour
         {
             if (debugMode) Debug.Log("[CalibrationController] Starting walking calibration");
             walkingCalibration.StartCalibration();
+            calibrationStarted = true;
         }
     }
 
