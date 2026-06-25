@@ -235,7 +235,7 @@ MonoBehaviour:
   startupSound: {fileID: 8300000, guid: ebababae148f840cea4511ef94a3de4b, type: 3}
   stillnessSound: {fileID: 0}
   completedBGM: {fileID: 0}
-  cautionAudio: {fileID: 8300000, guid: 3f0e4570995d44793894fdf83c29a57c, type: 3}
+  cautionAudio: {fileID: 8300000, guid: efb6c4d7740cf2a4b88e5cbe19c934dd, type: 3}
   bgAudioSource: {fileID: 1566038538}
   cautionAudioSource: {fileID: 969047838}
   calibrationController: {fileID: 1669193913}

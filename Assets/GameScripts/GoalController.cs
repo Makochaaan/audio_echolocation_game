@@ -34,6 +34,8 @@ public class CatGoalController : MonoBehaviour
     public bool meowWhileIdle = true;
     [Tooltip("静止時に鳴く間隔（ターン）。1なら毎ターン鳴きます。")]
     public int meowIntervalDuringIdle = 1;
+    [Tooltip("鳴き声を再生するまでの遅延（秒）。0なら即時再生。")]
+    public float meowDelay = 0.2f;
 
     void Start()
     {
@@ -116,9 +118,25 @@ public class CatGoalController : MonoBehaviour
             clipToPlay = randomMeowCandidates[randomIndex];
         }
 
-        if (clipToPlay != null)
+        if (clipToPlay == null) return;
+
+        if (meowDelay > 0f)
+        {
+            StartCoroutine(PlayMeowDelayed(clipToPlay, meowDelay));
+        }
+        else
         {
             audioSource.PlayOneShot(clipToPlay);
+        }
+    }
+
+    // 指定秒数待ってから鳴き声を再生する
+    private IEnumerator PlayMeowDelayed(AudioClip clip, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
         }
     }
 

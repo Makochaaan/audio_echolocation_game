@@ -964,9 +964,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8cc19b915eedf4fa71ebb3124b742d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  echoSound: {fileID: 8300000, guid: f718d7e43343bb64792b714b7e387452, type: 3}
-  footstepRSound: {fileID: 8300000, guid: d8cc484962296d54ba5e492292b0a340, type: 3}
-  footstepLSound: {fileID: 8300000, guid: 38af07de7d830d942a7bf5f0a89bb526, type: 3}
+  echoSound: {fileID: 8300000, guid: 089fb5672596c5e47a2fbe45dbf8f7aa, type: 3}
+  footstepRSound: {fileID: 8300000, guid: 089fb5672596c5e47a2fbe45dbf8f7aa, type: 3}
+  footstepLSound: {fileID: 8300000, guid: 250fcaea76eadb94db8784a1ab837544, type: 3}
   maxDistance: 5
   soundSpeed: 10
   volumeRolloffCurve:
@@ -1567,6 +1567,7 @@ MonoBehaviour:
   playerTransform: {fileID: 1265943442}
   meowWhileIdle: 1
   meowIntervalDuringIdle: 1
+  meowDelay: 1
 --- !u!114 &1283935694
 MonoBehaviour:
   m_ObjectHideFlags: 0

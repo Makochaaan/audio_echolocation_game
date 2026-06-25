@@ -64,6 +64,7 @@ public class PlayerController2D : MonoBehaviour
     private AudioSource bumpAudioSource; // 衝突・ノイズ音用の使い回すスピーカー
     private Echolocation echolocation;
     private bool isActing = false;
+    private bool isClearing = false; // クリア演出の二重起動を防ぐ。シーン再ロードで自動的にfalseへ戻る
     private bool bumpedSinceLastCheck = false;
     private bool inputBlockedUntilRelease = false;
     private bool wasIntroAudioPlaying = false;
@@ -298,6 +299,8 @@ public class PlayerController2D : MonoBehaviour
     // ★追加：ゲームクリア時の演出とシーン遷移
     IEnumerator GameClearRoutine()
     {
+    if (isClearing) yield break; // ★2回目以降は何もしない（最初のyieldより前なので同フレーム二重起動も防げる）
+    isClearing = true;
     isActing = true; // 以降の操作を完全にロック
     // クリアBGMとナレーションを鳴らす
     if (clearBgm != null && clearBgmSource != null)
@@ -306,10 +309,11 @@ public class PlayerController2D : MonoBehaviour
     clearBgmSource.loop = false;
     clearBgmSource.Play();
     }
-    if (clearNarration != null && clearNarrationSource != null)
-    {
-    clearNarrationSource.PlayOneShot(clearNarration);
-    }
+    // クリアナレーション(Clear.WAV)はBGM(Ending-4.aif)とクリア音が重複するため鳴らさない
+    // if (clearNarration != null && clearNarrationSource != null)
+    // {
+    // clearNarrationSource.PlayOneShot(clearNarration);
+    // }
     // クリアテキストなどのUIを表示
     if (clearUI != null)
     {
