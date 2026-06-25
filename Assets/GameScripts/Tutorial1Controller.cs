@@ -175,6 +175,10 @@ public class Tutorial1Controller : MonoBehaviour
 
         yield return StartCoroutine(PlayInstruction("向きが変わりました。向きを変えると、進める方向が変わります。ゲームの中では90度づつ曲がることができます。もう一度、同じ向きで、向きを変えてみてください。", narrationClips[4]));
 
+        // ★このステップ完了後に 2DScene へ遷移する（以降のチュートリアル手順はスキップ）
+        SceneManager.LoadScene("2DScene");
+        yield break;
+
         while (turnCount < 2) yield return null;
 
         yield return StartCoroutine(PlayInstruction("歩いてください。", narrationClips[5]));
