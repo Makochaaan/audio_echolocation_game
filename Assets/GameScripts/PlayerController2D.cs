@@ -400,6 +400,12 @@ public class PlayerController2D : MonoBehaviour
     }
     transform.rotation = targetRotation;
     EndTurn();
+    // 回転を歩行と誤検知しないよう、回転中に増えた歩数は歩行として処理しない
+    if (imuInterface != null)
+    {
+    lastStepCount = imuInterface.GetStepCount();
+    }
+    pendingImuSteps = 0;
     isActing = false;
     }
     IEnumerator HandleBump(Vector3 position, string hitTag)
