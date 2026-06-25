@@ -37,6 +37,19 @@ public class Echolocation : MonoBehaviour
 
     public event System.Action OnEchoFinished;
 
+    [Header("デバッグ表示")]
+    [Tooltip("実機画面に反響音の発生状況をオーバーレイ表示します")]
+    public bool showDebug = true;
+    [Tooltip("ON にすると spatializer を使わずに鳴らします（実機の無音切り分け用）。鳴れば spatializer が原因")]
+    public bool forceDisableSpatialize = false;
+    [Tooltip("ON にすると完全2D(spatialBlend=0)で鳴らします。距離減衰を無視するので、鳴れば距離/3D が原因、鳴らなければ出力段が原因")]
+    public bool debugForce2D = false;
+    private float lastDistToListener = -1f;
+    private int sonarCount = 0;   // TriggerSonar が呼ばれた回数
+    private int hitCount = 0;     // レイが壁に当たった回数（=エコー予約数）
+    private int playCount = 0;    // 実際に source.Play() した回数
+    private string lastPlayInfo = "(まだ再生なし)";
+
     // 空いている（音が鳴り終わった）スピーカーを探す、なければ作る
     private AudioSource GetAvailableSource()
     {
@@ -63,8 +76,8 @@ public class Echolocation : MonoBehaviour
         }
         
         // 強力な立体音響(Spatialize)を強制的に有効化
-        newSource.spatialBlend = 1.0f; 
-        newSource.spatialize = true; 
+        newSource.spatialBlend = 1.0f;
+        newSource.spatialize = !forceDisableSpatialize;
         
         try 
         {
@@ -87,6 +100,7 @@ public class Echolocation : MonoBehaviour
     // PlayerController から1歩進むたびに呼び出される
     public void TriggerSonar()
     {
+        sonarCount++;
         float[] angles = { 0f, 90f, 180f, 270f };
 
         foreach (float angle in angles)
@@ -95,6 +109,7 @@ public class Echolocation : MonoBehaviour
 
             if (Physics.Raycast(transform.position, direction, out RaycastHit hit, maxDistance))
             {
+                hitCount++;
                 float delay = hit.distance / soundSpeed;
                 if (Mathf.Approximately(angle, 90f))
                 {
@@ -151,14 +166,43 @@ public class Echolocation : MonoBehaviour
     {
         AudioSource source = GetAvailableSource();
         // 万が一プールされた音源のSpatializeが外れていた場合は強制的に再適用
-        source.spatialize = true;
+        source.spatialize = !forceDisableSpatialize;
+        source.spatialBlend = debugForce2D ? 0f : 1f;
         ApplyReverb(source);
 
         source.transform.position = position;
         source.clip = clip;
         source.Play();
 
+        AudioListener listener = FindObjectOfType<AudioListener>();
+        lastDistToListener = (listener != null) ? Vector3.Distance(listener.transform.position, position) : -1f;
+
+        playCount++;
+        string mixer = (source.outputAudioMixerGroup != null) ? source.outputAudioMixerGroup.name : "なし(未ルーティング)";
+        lastPlayInfo = $"{clip.name} vol={source.volume:0.00} blend={source.spatialBlend:0.0} spat={source.spatialize} playing={source.isPlaying} mixer={mixer}";
+        Debug.Log($"[Echo] Play #{playCount} {lastPlayInfo} dist={lastDistToListener:0.0}/max{maxDistance} listener={(listener != null ? listener.name : "なし!!")} pos={position}");
+
         StartCoroutine(NotifyEchoFinished(source));
+    }
+
+    void OnGUI()
+    {
+        if (!showDebug) return;
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.fontSize = 28;
+        style.normal.textColor = Color.green;
+        string text =
+            "[Echo Debug]\n" +
+            $"Sonar呼び出し: {sonarCount}\n" +
+            $"壁ヒット(予約): {hitCount}\n" +
+            $"再生Play数: {playCount}\n" +
+            $"プール数: {sourcePool.Count}\n" +
+            $"MixerGroup: {(spatialMixerGroup != null ? spatialMixerGroup.name : "未割当!!")}\n" +
+            $"spatialize強制OFF: {forceDisableSpatialize} / 強制2D: {debugForce2D}\n" +
+            $"リスナー距離: {lastDistToListener:0.0} / maxDistance: {maxDistance}\n" +
+            $"AudioListener.volume: {AudioListener.volume:0.00}\n" +
+            $"最後の再生: {lastPlayInfo}";
+        GUI.Label(new Rect(20, 20, Screen.width - 40, 500), text, style);
     }
 
     IEnumerator NotifyEchoFinished(AudioSource source)

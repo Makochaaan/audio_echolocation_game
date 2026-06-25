@@ -966,29 +966,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   echoSound: {fileID: 8300000, guid: 089fb5672596c5e47a2fbe45dbf8f7aa, type: 3}
   footstepRSound: {fileID: 8300000, guid: 089fb5672596c5e47a2fbe45dbf8f7aa, type: 3}
-  footstepLSound: {fileID: 8300000, guid: 250fcaea76eadb94db8784a1ab837544, type: 3}
+  footstepLSound: {fileID: 8300000, guid: 089fb5672596c5e47a2fbe45dbf8f7aa, type: 3}
   maxDistance: 5
   soundSpeed: 10
   volumeRolloffCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: -1
+      time: 0.0083351135
+      value: 0.19881064
+      inSlope: -0.4458874
+      outSlope: -0.4458874
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.275
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -1
-      outSlope: 0
+      inSlope: -0.50793654
+      outSlope: -0.50793654
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.11250001
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -998,6 +998,9 @@ MonoBehaviour:
   reverbPreset: 9
   reverbLevel: -1000
   reverbDecayTime: 2.5
+  showDebug: 1
+  forceDisableSpatialize: 0
+  debugForce2D: 0
 --- !u!114 &1265943436
 MonoBehaviour:
   m_ObjectHideFlags: 0
