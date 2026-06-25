@@ -345,6 +345,12 @@ public class PlayerController2D : MonoBehaviour
     {
     StartCoroutine(HandleBump(hit.point, hit.collider.tag));
     if (consumeTurnOnBump) EndTurn();
+    // 壁にぶつかっている間にセンサが進めた歩数も持ち越さない
+    if (imuInterface != null)
+    {
+    lastStepCount = imuInterface.GetStepCount();
+    }
+    pendingImuSteps = 0;
     isActing = false;
     yield break;
     }
@@ -368,6 +374,12 @@ public class PlayerController2D : MonoBehaviour
         echolocation.TriggerSonar();
     }
     EndTurn();
+    // 1歩=1マス。移動中にセンサが進めた歩数は次の歩行検知に持ち越さない
+    if (imuInterface != null)
+    {
+    lastStepCount = imuInterface.GetStepCount();
+    }
+    pendingImuSteps = 0;
     isActing = false;
     }
     IEnumerator TurnGrid(Vector3 direction)
