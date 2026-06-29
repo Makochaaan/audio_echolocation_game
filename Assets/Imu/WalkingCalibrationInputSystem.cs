@@ -95,6 +95,7 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
     public void StartCalibration()
     {
         Debug.Log("Calibration started.");
+        AnalyticsLogger.Event("calibration_start");
 
         isCalibrating = true;
         IsCalibrated = false;
@@ -144,6 +145,14 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
             Debug.Log($"Std       : {Std:F6}");
             Debug.Log($"Threshold : {Threshold:F6}");
             Debug.Log($"Sample count: {rawList.Count}");
+
+            AnalyticsLogger.Event("calibration_finish", new Dictionary<string, object>
+            {
+                {"threshold", Threshold},
+                {"mean",Mean},
+                {"std", Std},
+                {"samples",rawList.Count},
+            });
         }
     }
 
