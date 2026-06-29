@@ -223,6 +223,12 @@ public class CatGoalController : MonoBehaviour
         }
 
         transform.position = targetPosition;
+        AnalyticsLogger.Event("cat_move", new Dictionary<string, object>
+            {
+                {"x",Mathf.RoundToInt(targetPosition.x)},
+                {"z",Mathf.RoundToInt(targetPosition.z)},
+            });
+
         isMoving = false;
     }
 }

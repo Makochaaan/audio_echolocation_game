@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 // WaitingScene 用: 端末を所定の向き（z ≈ -1g）で静止保持し続けたら
 // ゲーム開始トリガーとして次シーンへ遷移する。

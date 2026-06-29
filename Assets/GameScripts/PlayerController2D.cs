@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController2D : MonoBehaviour
@@ -365,6 +366,12 @@ public class PlayerController2D : MonoBehaviour
         yield return null;
     }
     transform.position = targetPosition;
+    AnalyticsLogger.Event("player_move", new Dictionary<string, object>
+    {
+        {"fromIMU",fromImu},
+        {"x",Mathf.RoundToInt(targetPosition.x)},
+        {"z",Mathf.RoundToInt(targetPosition.z)},
+    });
     if (stepClipLength > moveTime)
     {
         yield return new WaitForSeconds(stepClipLength - moveTime);
@@ -385,6 +392,11 @@ public class PlayerController2D : MonoBehaviour
     IEnumerator TurnGrid(Vector3 direction)
     {
     isActing = true;
+    float turnDir = Vector3.Dot(direction.normalized, transform.right);
+    AnalyticsLogger.Event("player_turn", new Dictionary<string, object>
+    {
+        {"dir", turnDir > 0.1f ? "right":(turnDir < -0.1f ? "left": "other")}
+    });
     if (audioSource != null)
     {
     float turnDot = Vector3.Dot(direction.normalized, transform.right);
@@ -423,6 +435,10 @@ public class PlayerController2D : MonoBehaviour
     IEnumerator HandleBump(Vector3 position, string hitTag)
     {
     bumpedSinceLastCheck = true;
+    AnalyticsLogger.Event("player_bump", new Dictionary<string, object>
+    {
+        {"tag", hitTag},
+    });
     bumpAudioSource.transform.position = position;
     if (bumpSound != null)
     {
