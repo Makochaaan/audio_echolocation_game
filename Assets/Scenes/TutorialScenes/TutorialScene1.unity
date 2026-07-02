@@ -573,6 +573,9 @@ MonoBehaviour:
   reverbPreset: 9
   reverbLevel: -1000
   reverbDecayTime: 2.5
+  showDebug: 1
+  forceDisableSpatialize: 0
+  debugForce2D: 0
 --- !u!114 &1265943436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -587,8 +590,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveTime: 0.2
   gridSize: 1
-  groundSound: {fileID: 8300000, guid: f3587a31ff3cc414da92ae576772194e, type: 3}
-  metalSound: {fileID: 8300000, guid: f3587a31ff3cc414da92ae576772194e, type: 3}
+  groundSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
+  metalSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
   turnSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
   turnRightSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
   turnLeftSound: {fileID: 8300000, guid: 8683cdda8480940b088615125883129c, type: 3}
