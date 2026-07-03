@@ -590,8 +590,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveTime: 0.2
   gridSize: 1
-  groundSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
-  metalSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
+  groundSound: {fileID: 8300000, guid: a643b029f0d44704d8c28b5899741e7f, type: 3}
+  metalSound: {fileID: 8300000, guid: a643b029f0d44704d8c28b5899741e7f, type: 3}
   turnSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
   turnRightSound: {fileID: 8300000, guid: e68cbb5c768ee4957af32015281f3fe3, type: 3}
   turnLeftSound: {fileID: 8300000, guid: 8683cdda8480940b088615125883129c, type: 3}

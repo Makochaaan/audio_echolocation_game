@@ -964,9 +964,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8cc19b915eedf4fa71ebb3124b742d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  echoSound: {fileID: 8300000, guid: 241b396b6b4bd47b0850969bcacdf34f, type: 3}
-  footstepRSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
-  footstepLSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
+  echoSound: {fileID: 8300000, guid: 5d43981acd12cbf49a44ab95f4fe78d1, type: 3}
+  footstepRSound: {fileID: 8300000, guid: 5d43981acd12cbf49a44ab95f4fe78d1, type: 3}
+  footstepLSound: {fileID: 8300000, guid: 5d43981acd12cbf49a44ab95f4fe78d1, type: 3}
   maxDistance: 5
   soundSpeed: 10
   volumeRolloffCurve:
@@ -1015,8 +1015,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveTime: 0.2
   gridSize: 1
-  groundSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
-  metalSound: {fileID: 8300000, guid: 94ca265cf49404a74972080011b2e7a5, type: 3}
+  groundSound: {fileID: 8300000, guid: a643b029f0d44704d8c28b5899741e7f, type: 3}
+  metalSound: {fileID: 8300000, guid: a643b029f0d44704d8c28b5899741e7f, type: 3}
   turnSound: {fileID: 0}
   turnRightSound: {fileID: 8300000, guid: bb460a6414305d04891ffc81edef586d, type: 3}
   turnLeftSound: {fileID: 8300000, guid: 1527b45a736174b4f924ed7a320c7c6b, type: 3}
