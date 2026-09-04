@@ -1026,7 +1026,7 @@ MonoBehaviour:
   consumeTurnOnBump: 1
   spatialMixerGroup: {fileID: 24300002, guid: b3759d28953664aa48c4205be41a7c49, type: 2}
   catGoal: {fileID: 1283935693}
-  clearBgm: {fileID: 8300000, guid: 78aad48eec3c74491a08e4bcef37d220, type: 3}
+  clearBgm: {fileID: 8300000, guid: 63619c74cdb604027b8ddb9247a798ae, type: 3}
   clearNarration: {fileID: 8300000, guid: 8990a505154e29044918b54f6234061b, type: 3}
   clearBgmSource: {fileID: 1265943437}
   clearNarrationSource: {fileID: 1265943437}
