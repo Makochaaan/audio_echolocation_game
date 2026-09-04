@@ -135,12 +135,9 @@ public class Tutorial1Controller : MonoBehaviour
     IEnumerator TutorialRoutine()
     {
         // --- ステップ1 ---
-        // テキスト：「壁を置きました」→ ナレーション前に壁を設置
-        Vector3 frontDir = GetGridDir(player.forward);
+        // ナレーション前にプレイヤーを中心とした7×7の部屋を設置
         Vector3 startPos = GetGridPos(player.position);
-        tutorialWall.transform.position = startPos + frontDir * 3f;
-        tutorialWall.tag = "Wall";
-        tutorialWall.SetActive(true);
+        BuildRoom(startPos);
 
         yield return StartCoroutine(PlayInstruction("まっすぐ歩いてみてください。", narrationClips[0]));
         // 2歩進んだら次のナレーションへ
@@ -326,6 +323,24 @@ public class Tutorial1Controller : MonoBehaviour
                 {
                     catController.PlayMeow(true);
                 }
+        }
+    }
+
+    // tutorialWall を雛形に、center を中心とした7×7（内側5×5）の外周24マスへ壁を複製する。
+    // 中央からはどの向きでも2歩進めて、3歩目で必ず壁にぶつかる
+    void BuildRoom(Vector3 center)
+    {
+        const int half = 3;
+        Transform room = new GameObject("TutorialRoom").transform;
+        for (int dx = -half; dx <= half; dx++)
+        {
+            for (int dz = -half; dz <= half; dz++)
+            {
+                if (Mathf.Abs(dx) != half && Mathf.Abs(dz) != half) continue;
+                GameObject wall = Instantiate(tutorialWall, center + new Vector3(dx, 0f, dz), Quaternion.identity, room);
+                wall.tag = "Wall";
+                wall.SetActive(true);
+            }
         }
     }
 

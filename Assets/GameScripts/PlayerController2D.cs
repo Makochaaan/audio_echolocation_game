@@ -89,7 +89,13 @@ public class PlayerController2D : MonoBehaviour
     {
     clearNarrationSource = audioSource;
     }
+    // Player自身の音(足音・回転・ナレーション・クリアBGM)は2D固定。
+    // spatialBlend=0だけではspatialize有効時にResonanceのHRTFが残り、
+    // 音源=リスナー位置(距離0)のため定位が不定になって片耳に寄るので、
+    // spatializeを切りResonanceMixerも経由させない
     audioSource.spatialBlend = 0f;
+    audioSource.spatialize = false;
+    audioSource.outputAudioMixerGroup = null;
     echolocation = GetComponent<Echolocation>();
     if (echolocation != null)
     {

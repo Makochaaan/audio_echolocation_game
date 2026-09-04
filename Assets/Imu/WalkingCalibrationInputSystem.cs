@@ -24,6 +24,10 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
 
     [SerializeField] private InterfaceClient interfaceClient;
 
+    [Header("Skip Settings")]
+    [Tooltip("スキップ時に記録するデフォルト閾値（InterfaceClient の初期値と同じ）")]
+    [SerializeField] private float defaultThreshold = 0.04f;
+
     [Header("Axis Settings")]
     [SerializeField] private bool useXAxis = false;
     [SerializeField] private bool useYAxis = true;
@@ -109,6 +113,35 @@ public class WalkingCalibrationInputSystem : MonoBehaviour
         smoothedList.Clear();
 
         startTime = Time.time;
+    }
+
+    /// <summary>
+    /// キャリブレーションをスキップした際に TripleTapSkip の onBeforeSkip から呼ぶ。
+    /// 計測値の代わりにデフォルト値を「前回結果」として保持し、以降のシーンへ引き継ぐ。
+    /// IsCalibrated は true にしない（CalibrationController の完了監視が反応して
+    /// 完了音声→通常遷移のフローが走るのを防ぐ。遷移は TripleTapSkip 側が行う）。
+    /// </summary>
+    public void ApplyDefaultCalibration()
+    {
+        isCalibrating = false;
+
+        Threshold = defaultThreshold;
+        Mean = 0.0f;
+        Std = 0.0f;
+
+        HasPersistedCalibration = true;
+        PersistedThreshold = defaultThreshold;
+        PersistedMean = 0.0f;
+        PersistedStd = 0.0f;
+
+        if (interfaceClient != null) interfaceClient.SetWalkingThreshold(defaultThreshold);
+
+        Debug.Log($"[WalkingCalibrationInputSystem] Calibration skipped. Default threshold={defaultThreshold:F6}");
+
+        AnalyticsLogger.Event("calibration_skip", new Dictionary<string, object>
+        {
+            {"threshold", defaultThreshold},
+        });
     }
 
     private float GetLateralAcceleration(Vector3 acceleration)

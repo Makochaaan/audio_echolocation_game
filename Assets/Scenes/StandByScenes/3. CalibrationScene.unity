@@ -193,6 +193,7 @@ MonoBehaviour:
   alpha: 0.1
   thresholdScale: 0.5
   interfaceClient: {fileID: 0}
+  defaultThreshold: 0.04
   useXAxis: 0
   useYAxis: 1
   useZAxis: 0
@@ -206,6 +207,69 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.9791315, y: 0.29408836, z: -0.5383568}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &764754855
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 764754857}
+  - component: {fileID: 764754856}
+  m_Layer: 0
+  m_Name: TripleTapSkip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &764754856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a4d09dc1479ea74aad4adf332ae3566, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextSceneName: TutorialScene1
+  maxTapInterval: 0.8
+  requiredTaps: 3
+  onBeforeSkip:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 85093256}
+        m_TargetAssemblyTypeName: WalkingCalibrationInputSystem, Assembly-CSharp
+        m_MethodName: ApplyDefaultCalibration
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  debugMode: 1
+--- !u!4 &764754857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754855}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.32286638, y: 9.85914, z: 3.5686615}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -243,7 +307,7 @@ MonoBehaviour:
   calibrationDelayTime: 3
   walkingCalibration: {fileID: 85093256}
   debugMode: 1
-  narrationSound: {fileID: 8300000, guid: d96e9ed26974ddf4a97246c6620752f2, type: 3}
+  narrationSound: {fileID: 8300000, guid: bb18e351044ff204eae3b031ebaec5c1, type: 3}
   audioSource: {fileID: 1546379544}
 --- !u!4 &1116833988
 Transform:
@@ -448,3 +512,4 @@ SceneRoots:
   - {fileID: 72030115}
   - {fileID: 85093257}
   - {fileID: 1265356303}
+  - {fileID: 764754857}
